@@ -339,7 +339,7 @@
     <script src="assets/js/web3/abi/i_se_audit_contract_abi.js"></script>
     <script src="assets/js/web3/connect.js"></script>
 
-    <script>
+    <script type="module">
 
         const totalAssessments = ge("total_assessments");
         const totalFilesUploaded = ge("total_files_uploaded"); 
@@ -577,24 +577,30 @@
                 var options = {};
                 options.method = 'POST';
                 options.headers ={}
-                options.headers.accept = 'application/binary'; 
+                options.headers.accept = '*/*'; 
                 options.headers.ContentType = 'multipart/form-data';
-                options.headers.Authorization = 'Basic '+ 'token:'+ web3StorageAPIToken;
+                options.headers.Authorization = 'Bearer '+ web3StorageAPIToken;
                 options.body = b;
             
                 console.log(options);
                 console.log("posting file");
                 
                 var res = await fetch(web3StorageAPIRoot + "/upload",options);
-                console.log(res);
-                var cid; 
-                console.log(cid);
-                upload.cid = cid; 
-                urisToAudit.push(cid);
-                
+
+                res.json()
+                .then(function(response){
+                    console.log(response);
+                    var cid = response.cid; 
+                    console.log(cid);
+                    upload.cid = cid; 
+                    urisToAudit.push(cid);
+                })
+                .catch(function(err){
+                    console.log(err);
+                });                                      
                 console.log("done : " + upload.label);
             }
-/*
+
             // build manifest 
             var manifest            = {}; 
             manifest.title          = auditTitle.value; 
@@ -603,12 +609,20 @@
             manifest.ownerName      = ownerName.value; 
 
             console.log(manifest);
-
+            import { NFTStorage } from 'https://cdn.jsdelivr.net/npm/nft.storage/dist/bundle.esm.min.js';
+            console.log("posting to nft.storage");
             // post to nft.storage             
-            const nftStorage = new NFTStorage({token : nftstorageAPIToken});
+            const nftStorage = new NFTStorage({ nftstorageAPIToken});
             var name = auditTitle.value;
-            var manifestUri; //= await nftstorage.store( {manifest, name, "Santa Elena Environmental Audit Upload Proof" } );
+            try {
+                var manifestUri = await nftstorage.store( {manifest, name, "Santa Elena Environmental Audit Upload Proof" } );
+                console.log(manifestUri);
+            }
+            catch(err) {
+                console.log(err);
+            }
 
+            /*
             // call upload 
             var seed = [ownerName.value, account, auditTitle.value, Math.round(new Date().getTime()/1000), maxAuditWindow.value, 0,0,0,0,"0x0000000000000000000000000000000000000000",""];
             console.log("seed : " + seed);
