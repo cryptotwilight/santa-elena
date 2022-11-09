@@ -2,6 +2,22 @@ iSEAuditManagerAbi = [
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "_administrator",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_registry",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "string",
 				"name": "_status",
 				"type": "string"
@@ -35,6 +51,19 @@ iSEAuditManagerAbi = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getName",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			}
+		],
+		"stateMutability": "pure",
 		"type": "function"
 	},
 	{
@@ -80,6 +109,56 @@ iSEAuditManagerAbi = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getVersion",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "_version",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "notifyChangeOfAddress",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "_notified",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_auditContract",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_status",
+				"type": "string"
+			}
+		],
+		"name": "notifyStatus",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "_recieved",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -168,7 +247,7 @@ iSEAuditManagerAbi = [
 			},
 			{
 				"internalType": "string",
-				"name": "_manifestUri",
+				"name": "manifestUri",
 				"type": "string"
 			}
 		],

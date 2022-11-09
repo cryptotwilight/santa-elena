@@ -377,36 +377,9 @@
         const nftStorageAPIToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweENGNkM5OTY4NTY0NjMwYzhGMGZjZDlDOGExMzBCM2JkRWYzQkJBOTIiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY2Nzg2NzU1OTE0MCwibmFtZSI6InNvY2lhbGhvdXIifQ.fJ2vl_v6-oaYRU5FZztpyqwh6HaZXHH5lDUndxOMNF0"; 
 
         const submitNewAssessment = ge("submit_new_assessment");
-        submitNewAssessment.addEventListener("onClick", createNewAssessment);
+        submitNewAssessment.addEventListener("onClick", createNewAssessment);       
 
-       
-       
-       
-
-        function loadContracts() {
-            iSERegistryContract = getContract(iSERegistryAbi, iSERegistryAddress);
-
-            iSERegistryContract.methods.getAddress("SANTA_ELENA_AUDIT_MANAGER").call({from : account})
-            .then(function(response){
-                loadAuditManagerContract();
-            })
-            .catch(function(err){
-                console.log(err);
-            })
-        }
-
-        function loadAuditManagerContract() { 
-            iSERegistryContract.methods.getAddress("").call({from : account})
-            .then(function(response){
-                console.log(response)
-                iSEAuditManagerAddress = response; 
-                sEAuditManagerContract = getContract(iSEAuditManagerAbi, iSEAuditManagerAddress);
-            })
-            .catch(function(err){
-                console.log(err);
-            })
-        }
-
+ 
         function loadStats() {
 
         }
@@ -668,6 +641,8 @@
         }
 
         function postToBlockchain(seed, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri) {
+            console.log("sending");
+            console.log(sEAuditManagerContract);
             sEAuditManagerContract.methods.uploadFiles(seed, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri).send({from : account})
             .then(function(response){
                 console.log(response);
