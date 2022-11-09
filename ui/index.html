@@ -327,6 +327,11 @@
     <script src="assets/js/bootstrap.js"></script>
     <script src="assets/js/app.js"></script>
 
+    <!-- abi -->
+    <script src="assets/js/web3/i_se_registry_abi.js"></script>
+    <script src="assets/js/web3/i_se_audit_manager_abi.js"></script>
+    <script src="assets/js/web3/i_se_audit_contract_abi.js"></script>
+
     <script>
         const connectBlockchainButton = ge("connect_web3");
         const showWallet = ge("show_wallet");
@@ -436,16 +441,34 @@
             }
         };
 
-
+        const iSERegistryAddress = "0x8425bf71B1Aa58123e187895a05c484CA918779c"; 
+        var iSERegistryContract;
         var iSEAuditManagerAddress = "";
         var sEAuditManagerContract; 
 
         function loadContracts() {
-            sEAuditManagerContract = getContract(iSEAuditManagerAbi, iSEAuditManagerAddress);
+            iSERegistryContract = getContract(iSERegistryAbi, iSERegistryAddress);
 
-
+            iSERegistryContract.methods.getAddress("").call({from : account})
+            .then(function(response){
+                loadAuditManagerContract();
+            })
+            .catch(function(err){
+                console.log(err);
+            })
         }
 
+        function loadAuditManagerContract() { 
+            iSERegistryContract.methods.getAddress("").call({from : account})
+            .then(function(response){
+                console.log(response)
+                var iSEAuditManagerAddress = response; 
+                sEAuditManagerContract = getContract(iSEAuditManagerAbi, iSEAuditManagerAddress);
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
 
         function loadStats() {
 
