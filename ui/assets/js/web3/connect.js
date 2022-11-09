@@ -1,6 +1,10 @@
 const connectBlockchainButton = ge("connect_web3");
 const showWallet = ge("show_wallet");
 const web3 = new Web3(window.ethereum);
+const iSERegistryAddress = "0x8425bf71B1Aa58123e187895a05c484CA918779c"; 
+var iSERegistryContract;
+var iSEAuditManagerAddress;
+var sEAuditManagerContract; 
 
 var account;
 //Created check function to see if the MetaMask extension is installed
