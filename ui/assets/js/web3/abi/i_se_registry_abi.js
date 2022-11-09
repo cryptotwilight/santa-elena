@@ -1,4 +1,4 @@
-iSERegistry = [
+iSERegistryAbi = [
 	{
 		"inputs": [
 			{

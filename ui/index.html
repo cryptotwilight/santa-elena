@@ -61,13 +61,13 @@
                         </li>
                         <li class="sidebar-item ">
                             <a href="audit.html" class='sidebar-link'>
-                                <i class="bi bi-1-square"></i>
+                                <i class="bi bi-file-post"></i>
                                 <span>Audit</span>
                             </a>
                         </li>
                         <li class="sidebar-item ">
                             <a href="atheneum.html" class='sidebar-link'>
-                                <i class="bi bi-1-circle"></i>
+                                <i class="bi bi bi-files"></i>
                                 <span>Atheneum</span>
                             </a>
                         </li>
@@ -294,7 +294,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="col-12 d-flex justify-content-end">
-                                                            <button type="submit" id="submit_new_assessment" class="btn btn-primary me-1 mb-1">Submit</button>
+                                                            <a href="javascript:createNewAssessment()" id="submit_new_assessment" class="btn btn-primary me-1 mb-1">Submit</a>                                                            
                                                             <button type="reset" id="clear_assessment_form" class="btn btn-light-secondary me-1 mb-1">Reset</button>
                                                         </div>
                                                     </div>
@@ -328,9 +328,9 @@
     <script src="assets/js/app.js"></script>
 
     <!-- abi -->
-    <script src="assets/js/web3/i_se_registry_abi.js"></script>
-    <script src="assets/js/web3/i_se_audit_manager_abi.js"></script>
-    <script src="assets/js/web3/i_se_audit_contract_abi.js"></script>
+    <script src="assets/js/web3/abi/i_se_registry_abi.js"></script>
+    <script src="assets/js/web3/abi/i_se_audit_manager_abi.js"></script>
+    <script src="assets/js/web3/abi/i_se_audit_contract_abi.js"></script>
 
     <script>
         const connectBlockchainButton = ge("connect_web3");
@@ -348,11 +348,11 @@
         const uploadFile3 = ge("upload_file_3");
         const uploadFile4 = ge("upload_file_4");
         const uploadFile5 = ge("upload_file_5");
-        const uploadFile1Label = ge("upload_file_1_label");
-        const uploadFile2Label = ge("upload_file_2_label");
-        const uploadFile3Label = ge("upload_file_3_label");
-        const uploadFile4Label = ge("upload_file_4_label");
-        const uploadFile5Label = ge("upload_file_5_label");
+        const uploadFile1Label = ge("upload_file_1_onchain_label");
+        const uploadFile2Label = ge("upload_file_2_onchain_label");
+        const uploadFile3Label = ge("upload_file_3_onchain_label");
+        const uploadFile4Label = ge("upload_file_4_onchain_label");
+        const uploadFile5Label = ge("upload_file_5_onchain_label");
         const uploadFile1isPrivate = ge("upload_file_1_privacy");
         const uploadFile2isPrivate = ge("upload_file_2_privacy");
         const uploadFile3isPrivate = ge("upload_file_3_privacy");
@@ -360,7 +360,7 @@
         const uploadFile5isPrivate = ge("upload_file_5_privacy");
 
         const submitNewAssessment = ge("submit_new_assessment");
-        submitNewAssessment.addEventListener("onclick", createNewAssessment);
+        submitNewAssessment.addEventListener("onClick", createNewAssessment());
 
         const web3StorageAPIRoot = "https://api.web3.storage";
         const web3StorageAPIToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDc3NDZBZDJCYzZjNjUwRTQwMDA5QTU0YjVjNjQ1MjlkZEIzQzg2RGUiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njc5NDY2MjIwOTEsIm5hbWUiOiJzb2NpYWwgaG91ciJ9.ZLhXsvFSWRmQ6YtsheYkknSwXPLsnIuI9NKwL7y7JLQ"; 
@@ -443,13 +443,13 @@
 
         const iSERegistryAddress = "0x8425bf71B1Aa58123e187895a05c484CA918779c"; 
         var iSERegistryContract;
-        var iSEAuditManagerAddress = "";
+        var iSEAuditManagerAddress;
         var sEAuditManagerContract; 
 
         function loadContracts() {
             iSERegistryContract = getContract(iSERegistryAbi, iSERegistryAddress);
 
-            iSERegistryContract.methods.getAddress("").call({from : account})
+            iSERegistryContract.methods.getAddress("SANTA_ELENA_AUDIT_MANAGER").call({from : account})
             .then(function(response){
                 loadAuditManagerContract();
             })
@@ -462,7 +462,7 @@
             iSERegistryContract.methods.getAddress("").call({from : account})
             .then(function(response){
                 console.log(response)
-                var iSEAuditManagerAddress = response; 
+                iSEAuditManagerAddress = response; 
                 sEAuditManagerContract = getContract(iSEAuditManagerAbi, iSEAuditManagerAddress);
             })
             .catch(function(err){
@@ -567,35 +567,46 @@
 
         function createUploadJson(){ 
             var uploadList = [];
-            var upload1 = {};
-            upload1.file = uploadFile1.file; 
-            upload1.label = uploadFile1Label.value; 
-            upload1.isPrivate = uploadFile1isPrivate.checked; 
-            uploadList.push(upload1);
 
-            var upload2 = {};
-            upload2.file = uploadFile2.file; 
-            upload2.label = uploadFile2Label.value; 
-            upload2.isPrivate = uploadFile2isPrivate.checked; 
-            uploadList.push(upload2);
-            
-            var upload3 = {};
-            upload3.file = uploadFile3.file; 
-            upload3.label = uploadFile3Label.value; 
-            upload3.isPrivate = uploadFile3isPrivate.checked; 
-            uploadList.push(upload3);
-            
-            var upload4 = {};
-            upload4.file = uploadFile4.file; 
-            upload4.label = uploadFile4Label.value; 
-            upload4.isPrivate = uploadFile4isPrivate.checked; 
-            uploadList.push(upload4);
-            
-            var upload5 = {};
-            upload5.file = uploadFile5.file; 
-            upload5.label = uploadFile1Label5.value; 
-            upload5.isPrivate = uploadFile5isPrivate.checked; 
-            uploadList.push(upload5);
+            var upload1 = {};
+            console.log(uploadFile1.files);
+            if(uploadFile1.files.length > 0){
+                upload1.file = uploadFile1.files[0]; 
+                upload1.label = uploadFile1Label.value; 
+                upload1.isPrivate = uploadFile1isPrivate.checked; 
+                uploadList.push(upload1);
+            }
+
+            if(uploadFile2.files.length > 0){
+                var upload2 = {};
+                upload2.file = uploadFile2.files[0]; 
+                upload2.label = uploadFile2Label.value; 
+                upload2.isPrivate = uploadFile2isPrivate.checked; 
+                uploadList.push(upload2);
+            }
+            if(uploadFile3.files.length > 0){
+                var upload3 = {};
+                upload3.file = uploadFile3.files[0]; 
+                upload3.label = uploadFile3Label.value; 
+                upload3.isPrivate = uploadFile3isPrivate.checked; 
+                uploadList.push(upload3);
+            }
+            if(uploadFile4.files.length > 0){
+                var upload4 = {};
+                upload4.file = uploadFile4.files[0]; 
+                upload4.label = uploadFile4Label.value; 
+                upload4.isPrivate = uploadFile4isPrivate.checked; 
+                uploadList.push(upload4);
+            }
+
+            if(uploadFile5.files.length > 0){
+                var upload5 = {};
+                upload5.file = uploadFile5.files[0]; 
+                upload5.label = uploadFile5Label.value; 
+                upload5.isPrivate = uploadFile5isPrivate.checked; 
+                uploadList.push(upload5);
+            }
+            return uploadList;
         }
 
         function getFilesUploaded(uploads) {
@@ -614,22 +625,38 @@
         async function createNewAssessment() {
             // create uri array 
             var urisToAudit = [];
-            
-
+                    
             var uploads = createUploadJson();
+            console.log(uploads);
             // post files to web3.storage 
             for(var x = 0; x < uploads.length; x++) {
                 var upload = uploads[x];
                 var file = upload.file; 
                 //var cid = await client.put(file, { name : file.name, maxRetries:3});
-                var res = await fetch(web3StorageAPIRoot,{ method : 'POST', headers : {'Content-Type' : multipart/form-data, }, body : file, });
+                console.log(file);
+                var b = new Blob([file]); 
+
+                var options = {};
+                options.method = 'POST';
+                options.headers ={}
+                options.headers.accept = 'application/binary'; 
+                options.headers.ContentType = 'multipart/form-data';
+                options.headers.Authorization = 'Basic '+ 'token:'+ web3StorageAPIToken;
+                options.body = b;
+            
+                console.log(options);
+                console.log("posting file");
+                
+                var res = await fetch(web3StorageAPIRoot + "/upload",options);
                 console.log(res);
                 var cid; 
                 console.log(cid);
                 upload.cid = cid; 
                 urisToAudit.push(cid);
+                
+                console.log("done : " + upload.label);
             }
-
+/*
             // build manifest 
             var manifest            = {}; 
             manifest.title          = auditTitle.value; 
@@ -647,7 +674,12 @@
             // call upload 
             var seed = [ownerName.value, account, auditTitle.value, Math.round(new Date().getTime()/1000), maxAuditWindow.value, 0,0,0,0,"0x0000000000000000000000000000000000000000",""];
             console.log("seed : " + seed);
-            sEAuditManagerContract.methods.uploadFiles(seed, urisToAudit, _private, notesUri, manifestUri).send({from : account})
+            postToBlockchain(seed, urisToAudit, isUrisToAudit, isPrivate, notesUri, manifestUri);
+            */
+        }
+
+        function postToBlockChain() {
+            sEAuditManagerContract.methods.uploadFiles(seed, urisToAudit, isPrivate, notesUri, manifestUri).send({from : account})
             .then(function(response){
                 console.log(response);
                 displayLatestAssessments(); 
@@ -655,12 +687,10 @@
             .catch(function(error){
                 console.log(error);
             });
-
-
         }
 
         function getContract(abi, address) {
-            return web3.eth.Contract(abi, address);
+            return new web3.eth.Contract(abi, address);
         }
 
         function ge(element) {
