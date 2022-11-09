@@ -73,6 +73,12 @@
                     <i class="bi bi bi-files"></i>
                     <span>Atheneum</span>
                 </a>
+            </li>
+            <li>
+                <a href="https://github.com/cryptotwilight/santa-elena" class='sidebar-link'>
+                    <i class="bi bi bi-github"></i>
+                    <span>Source Code</span>
+                </a>
             </li>            
         </ul>
     </div>
@@ -103,7 +109,7 @@
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Total Audits</h6>
-                                    <h6 class="font-extrabold mb-0">112</h6>
+                                    <h6 class="font-extrabold mb-0"><span id="total_audits"></span></h6>
                                 </div>
                             </div>
                         </div>
@@ -115,12 +121,12 @@
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start ">
                                     <div class="stats-icon blue mb-2">
-                                        <i class="iconly-boldProfile"></i>
+                                        <i class="iconly-boldFolder"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                    <h6 class="text-muted font-semibold">Files Uploaded</h6>
-                                    <h6 class="font-extrabold mb-0">883</h6>
+                                    <h6 class="text-muted font-semibold">Total Files Uploaded</h6>
+                                    <h6 class="font-extrabold mb-0"><span id="total_files_uploaded"></span></h6>
                                 </div>
                             </div>
                         </div>
@@ -132,12 +138,12 @@
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start ">
                                     <div class="stats-icon green mb-2">
-                                        <i class="iconly-boldAdd-User"></i>
+                                        <i class="iconly-boldActivity"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Successful Audits</h6>
-                                    <h6 class="font-extrabold mb-0">80%</h6>
+                                    <h6 class="font-extrabold mb-0"><span id="successful_audits"></span></h6>
                                 </div>
                             </div>
                         </div>
@@ -149,12 +155,12 @@
                             <div class="row">
                                 <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start ">
                                     <div class="stats-icon red mb-2">
-                                        <i class="iconly-boldBookmark"></i>
+                                        <i class="iconly-boldChart"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Carbon Offset</h6>
-                                    <h6 class="font-extrabold mb-0">10512Kg CO<sub>2e</sub>/kWh</h6>
+                                    <h6 class="font-extrabold mb-0"><span id="carbon_offset"></span></h6>
                                 </div>
                             </div>
                         </div>
@@ -170,7 +176,7 @@
                         <div class="card-body">
                             <!-- table hover -->
                             <div class="table-responsive">
-                                <table class="table table-hover mb-0" id="latest_assessments_table">
+                                <table class="table table-hover mb-0" id="outstanding_assessments_table">
                                     <thead>
                                         <tr>
                                             <th>Title</th>
@@ -197,7 +203,7 @@
                         <div class="card-body">
                             <!-- table hover -->
                             <div class="table-responsive">
-                                <table class="table table-hover mb-0" id="latest_assessments_table">
+                                <table class="table table-hover mb-0" id="assessments_available_for_audit">
                                     <thead>
                                         <tr>
                                             <th>Title</th>
@@ -246,7 +252,160 @@
     <script src="assets/js/web3/connect.js"></script>
 
     <script> 
+        const outstandingAssessmentsTable = ge("outstanding_assessments_table");
+        const assessmentsAvailableForAuditTable = ge("assessments_available_for_audit");
+       
+        const totalAudits = ge("total_audits");
+        const totalFilesUploaded = ge("total_files_uploaded");
+        const successfulAudits = ge("successful_audits");
+        const carbonOffset  = ge("carbon_offset");
+
+        function loadStats() { 
+
+        }
+
+        function displayAssessments() {
+            buildOutstandingAssessmentsTable(); 
+            buildAvailableAssessmentsTable(); 
+            loadStats(); 
+        }
     
+        function buildOutstandingAssessmentsTable() {
+            outstandingAssessmentsTable.innerHTML = "";  
+            sEAuditManagerContract.methods.getContractsUnderAuditor(account).call({from : account})
+            .then(function(response){
+                console.log(response);
+                var auditAddressList = response; 
+                for(var x = 0; x < response.length; x++){
+                    var auditAddress = auditAddressList[x];
+                    buildOARow(auditAddress);
+                }
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
+
+        function buildAvailableAssessmentsTable() { 
+            assessmentsAvailableForAuditTable.innerHTML = "";
+            sEAuditManagerContract.methods.getAuditContractsWithStatus("READY").call({from : account})
+            .then(function(response){
+                console.log(response);
+                var auditAddressList = response; 
+                for(var x = 0; x < response.length; x++){
+                    var auditAddress = auditAddressList[x];
+                    buildAARow(auditAddress);
+                }
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
+
+        function buildOARow(auditAddress) {
+            var auditContract = getContract(iSEAuditContractAbi, auditAddress);
+            var row = outstandingAssessmentsTable.tbodies[0].insertRow(); 
+
+            var titleCell             = row.insertCell();
+            titleCell.setAttribute("class","text-bold-500");
+            var ownerCell             = row.insertCell(); 
+            var fileCountCell         = row.insertCell(); 
+            var auditEndDateCell      = row.insertCell();  
+            var statusCell            = row.insertCell();            
+            
+            auditContract.methods.getAuditSeed().call({from : account })
+            .then(function(response){
+                var a = ce("a");
+                a.setAttribute("href", "assessment_review.html?assessment="+auditAddress);
+                a.append(text(seed.auditTitle));
+                titleCell.append(a);
+                
+                ownerCell.append(text(seed.ownerName));
+                ownerCell.append(ce(br));
+                var small = ce("small");
+                small.append(text(seed.owner)); 
+                ownerCell.append(small);
+                
+                setFileCount(auditContract, fileCountCell);
+
+                setEstimatedAuditEndDate(auditContract, auditEndDateCell);
+                
+                setStatus(auditContract, statusCell)
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
+
+        function setFileCount(auditContract, fileCountCell){
+            auditContract.methods.getUrisToAudit().call({from : account})
+            .then(function(response){
+                console.log(response);
+                fileCountCell.append(text(response._auditUris.length));                
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
+
+        function setEstimatedAuditEndDate(auditContract, auditEndDateCell) {
+            auditContract.methods.getEstimatedAuditEndTime().call({from : acount})
+            .then(function(response){
+                console.log(response);
+                auditEndDateCell.append(text(format(response)));
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
+
+
+        function setStatus(auditContract, statusCell) {
+            auditContract.methods.getStatus().call({from : account})
+           .then(function(response){
+                console.log(response);
+                statusCell.append(text(response));
+           })
+           .catch(function(err){
+                console.log(err);
+           });
+        }
+
+
+        function buildAARow(auditAddress) {
+            var auditContract = getContract(iSEAuditContractAbi, auditAddress);
+            var row = assessmentsAvailableForAuditTable.tbodies[0].insertRow(); 
+
+            var titleCell               = row.insertCell();
+            titleCell.setAttribute("class","text-bold-500");
+            var ownerCell               = row.insertCell(); 
+            var fileCountCell           = row.insertCell(); 
+            var maxAuditPeriodCell      = row.insertCell(); 
+            var statusCell              = row.insertCell();             
+
+            auditContract.methods.getAuditSeed().call({from : account })
+            .then(function(response){
+                var a = ce("a");
+                a.setAttribute("href", "assessment_review.html?assessment="+auditAddress);
+                a.append(text(seed.auditTitle));
+                titleCell.append(a);
+                
+                ownerCell.append(text(seed.ownerName));
+                ownerCell.append(ce(br));
+                var small = ce("small");
+                small.append(text(seed.owner)); 
+                ownerCell.append(small);
+
+                setFileCount(auditContract, fileCountCell);
+
+                maxAuditPeriodCell.append(text(seed.maxAuditWindow + " days "));
+                
+                setStatus(auditContract, statusCell);
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
     </script>
 </body>
 

@@ -32,6 +32,11 @@ interface ISEAuditManager {
     function getAuditContractsWithStatus(string memory _status) view external returns (address [] memory _auditContracts);
 
     /** 
+     * @dev this retrieves all of the assessments under and auditor that are booked for audit 
+     * @return _auditContracts that are booked for audit by this auditor
+     */
+    function getContractsUnderAuditor(address _auditor) view external returns (address [] memory _auditContracts);
+    /** 
      * @dev this retrieves the published audit contracts for a given user 
      * @param _user user that owns the published contracts
      * @return _auditContracts audit contracts for owned by the stated user
@@ -40,7 +45,7 @@ interface ISEAuditManager {
 
     /** 
      * @dev this retrieves all audit contract public  & private held by this manager
-     * return _auditContracts public and non-public held by this manager 
+     * @return _auditContracts public and non-public held by this manager 
      */
     function getUserAuditContracts() view external returns (address [] memory _auditContracts);
 }

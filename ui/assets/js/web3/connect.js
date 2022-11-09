@@ -72,7 +72,29 @@ const onClickConnect = async() => {
 		console.error(error);
 	}
 };
+function loadContracts() {
+	iSERegistryContract = getContract(iSERegistryAbi, iSERegistryAddress);
 
+	iSERegistryContract.methods.getAddress("SANTA_ELENA_AUDIT_MANAGER").call({from : account})
+	.then(function(response){
+		loadAuditManagerContract();
+	})
+	.catch(function(err){
+		console.log(err);
+	})
+}
+
+function loadAuditManagerContract() { 
+	iSERegistryContract.methods.getAddress("").call({from : account})
+	.then(function(response){
+		console.log(response)
+		iSEAuditManagerAddress = response; 
+		sEAuditManagerContract = getContract(iSEAuditManagerAbi, iSEAuditManagerAddress);
+	})
+	.catch(function(err){
+		console.log(err);
+	})
+}
 function getContract(abi, address) {
 	return new web3.eth.Contract(abi, address);
 }

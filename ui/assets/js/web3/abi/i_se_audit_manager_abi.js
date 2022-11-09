@@ -19,6 +19,25 @@ iSEAuditManagerAbi = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_auditor",
+				"type": "address"
+			}
+		],
+		"name": "getContractsUnderAuditor",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "_auditContracts",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "getPublicAuditContracts",
 		"outputs": [

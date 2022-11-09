@@ -106,7 +106,7 @@
                                             </div>
                                             <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                                 <h6 class="text-muted font-semibold">Total Assessments</h6>
-                                                <h6 class="font-extrabold mb-0">112</h6>
+                                                <h6 class="font-extrabold mb-0">112<span id="total_assessments"></span></h6>
                                             </div>
                                         </div>
                                     </div>
@@ -118,12 +118,12 @@
                                         <div class="row">
                                             <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start ">
                                                 <div class="stats-icon blue mb-2">
-                                                    <i class="iconly-boldProfile"></i>
+                                                    <i class="iconly-boldFolder"></i>
                                                 </div>
                                             </div>
                                             <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                                 <h6 class="text-muted font-semibold">Files Uploaded</h6>
-                                                <h6 class="font-extrabold mb-0">883</h6>
+                                                <h6 class="font-extrabold mb-0">883<span id="files_upload"></span></h6>
                                             </div>
                                         </div>
                                     </div>
@@ -135,12 +135,12 @@
                                         <div class="row">
                                             <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start ">
                                                 <div class="stats-icon green mb-2">
-                                                    <i class="iconly-boldAdd-User"></i>
+                                                    <i class="iconly-boldActivity"></i>
                                                 </div>
                                             </div>
                                             <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                                 <h6 class="text-muted font-semibold">Successful Assessments</h6>
-                                                <h6 class="font-extrabold mb-0">80%</h6>
+                                                <h6 class="font-extrabold mb-0">80%<span id="successful_assessments"></span></h6>
                                             </div>
                                         </div>
                                     </div>
@@ -152,12 +152,12 @@
                                         <div class="row">
                                             <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start ">
                                                 <div class="stats-icon red mb-2">
-                                                    <i class="iconly-boldBookmark"></i>
+                                                    <i class="iconly-boldChart"></i>
                                                 </div>
                                             </div>
                                             <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                                 <h6 class="text-muted font-semibold">Carbon Offset</h6>
-                                                <h6 class="font-extrabold mb-0">512Kg CO<sub>2e</sub>/kWh</h6>
+                                                <h6 class="font-extrabold mb-0">512Kg CO<sub>2e</sub>/kWh<span id="carbon_offset"></span></h6>
                                             </div>
                                         </div>
                                     </div>
@@ -340,6 +340,11 @@
     <script src="assets/js/web3/connect.js"></script>
 
     <script>
+
+        const totalAssessments = ge("total_assessments");
+        const totalFilesUploaded = ge("total_files_uploaded"); 
+        const successfulAssessments = ge("successful_assessments");
+        const carbonOffset = ge("carbon_offset");
 
         const ownerName = ge("owner_name");
         const auditTitle = ge("audit_title");
