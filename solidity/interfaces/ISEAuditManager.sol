@@ -17,7 +17,7 @@ interface ISEAuditManager {
      * @param _notesUri explanatory notes on the uploaded data
      * @return _auditContract address of the audit contract 
      */
-    function uploadFiles(ISEAuditContract.AuditSeed memory _seed, string [] memory _urisToAudit, bool [] memory _private, string memory _notesUri, string memory _manifestUri) external returns (address _auditContract);
+    function uploadFiles(ISEAuditContract.AuditSeed memory _seed, string [] memory _urisToAudit, string [] memory _uriLabels, bool [] memory _private, string memory _notesUri, string memory _manifestUri) external returns (address _auditContract);
 
     /**
      * @dev this retrieves all the public audit contract managed by this manager 

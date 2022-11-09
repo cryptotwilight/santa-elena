@@ -21,21 +21,24 @@ contract SEAuditContract is ISEAuditContract {
 
     mapping(PROOF=>Proof) proofByPROOF; 
     mapping(bool=>string[]) auditUriByPrivacy; 
+    mapping(string=>AuditUri) auditUriByUri; 
 
     AUDIT_STATE state; 
     AUDIT_DECLARATION declaration;
     
     string auditReport; 
-    string [] urisToAudit;
-    bool [] uriPrivate; 
+    string [] uris; 
     string notesUri;
+
+    
 
     AuditSeed seed; 
     ISEAuditManagerNotification notifier; 
     ISEMinter minter;
 
     constructor(AuditSeed memory _seed, 
-                string[] memory _urisToAudit, 
+                string[] memory _urisToAudit,
+                string [] memory _uriLabels,  
                 bool [] memory _uriPrivacy, 
                 string memory _notesUri, 
                 address _auditManagerNotification,
@@ -45,12 +48,12 @@ contract SEAuditContract is ISEAuditContract {
         self = address(this);
         seed = _seed; 
         notifier = ISEAuditManagerNotification(_auditManagerNotification);
-        urisToAudit = _urisToAudit;
-        uriPrivate = _uriPrivacy;
+        uris = _urisToAudit; 
+        mapAuditUris(_urisToAudit, _uriLabels, _uriPrivacy);
         notesUri = _notesUri;
         state = AUDIT_STATE.READY;
         minter = ISEMinter(_minter);
-        for(uint256 x =0; x < urisToAudit.length; x++){
+        for(uint256 x =0; x < _urisToAudit.length; x++){
             if(_uriPrivacy[x]) {
                 auditUriByPrivacy[true].push(_urisToAudit[x]);
             }
@@ -103,15 +106,15 @@ contract SEAuditContract is ISEAuditContract {
     }
 
 
-    function getUrisToAudit() view external returns (string [] memory _urisToAudit, bool [] memory _private, string memory _notesUri){
+    function getUrisToAudit() view external returns (AuditUri [] memory _auditUris, string memory _notesUri){
         require(msg.sender == seed.owner || msg.sender == seed.auditor, " auditor / owner only ");
-        return (urisToAudit, uriPrivate, notesUri);
+        return (getAuditUris(uris), notesUri);
     }
 
 
-    function getPublicData() view external returns (string [] memory _publicDataUris){
+    function getPublicData() view external returns (AuditUri [] memory _publicAuditUris){
         require(state == AUDIT_STATE.PUBLIC," audit not public " );
-        return auditUriByPrivacy[false];
+        return getAuditUris(auditUriByPrivacy[false]);
     }
 
     function makePublic() external returns (bool _done) {
@@ -133,7 +136,7 @@ contract SEAuditContract is ISEAuditContract {
         return true; 
     }
   
-    function getAuditEndTime() view external returns (uint256 _auditEndTime){
+    function getEstimatedAuditEndTime() view external returns (uint256 _auditEndTime){
        return getAuditEndTimeInternal();
     }
 
@@ -170,12 +173,32 @@ contract SEAuditContract is ISEAuditContract {
         return "UNKNOWN";
     }
 
+    function getAuditUris(string [] memory _uris) view internal returns (AuditUri [] memory _auditUris) { 
+        _auditUris = new AuditUri[](_uris.length);
+        for(uint256 x = 0; x < _uris.length; x++) {
+           _auditUris[x] = auditUriByUri[_uris[x]]; 
+        }
+        return _auditUris;                 
+    }
+
+    function mapAuditUris(string [] memory _uris, string [] memory _labels, bool [] memory _isPrivate) internal returns (bool _mapped) {        
+        for(uint256 x = 0; x < _uris.length; x++) {
+            string memory uri_ = _uris[x];
+            AuditUri memory auditUri = AuditUri({
+                                                    uri : uri_, 
+                                                    label : _labels[x],
+                                                    isPrivate : _isPrivate[x]
+                                                });
+            auditUriByUri[uri_] = auditUri; 
+        }
+        return true;         
+    }
+
     function isAuditTimeExpired() view internal returns (bool _isExpired) {
         return getAuditEndTimeInternal() < block.timestamp; 
     }
 
     function getAuditEndTimeInternal() view internal returns (uint256 _endTime) {
-         require(seed.auditStart > 0 , "audit not started");
         return seed.auditStart + seed.maxAuditWindow; 
     }
 

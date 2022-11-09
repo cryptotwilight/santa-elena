@@ -46,6 +46,15 @@ interface ISEAuditContract {
         string auditorName; 
 
     }
+    /** @dev this is a representation of the uri that is audited */ 
+    struct AuditUri { 
+        /** @dev ipfs uri */
+        string uri; 
+        /** @dev label for the uri */
+        string label; 
+        /** @dev whether the uri is private or not */
+        bool isPrivate; 
+    }
 
     /**
      * @dev this returns the current status of the audit 
@@ -76,18 +85,17 @@ interface ISEAuditContract {
     function submitAuditReport(string memory _auditReportUri, AUDIT_DECLARATION _declaration, string memory _auditorSealUri, string memory _manifestUri) external returns (bool _submitted);
 
     /**
-     * @dev this function returns all the URIs to audit as well as indications on data privacy. 
-     * @return _urisToAudit list of uris containing audit data
-     * @return _private true if the data is private to the audit
+     * @dev this function returns all the URIs to audit as well as indications on data privacy.      
+     * @return _auditUris that are to be audited both public and private
      * @return _notesUri notes on the presented data
      */
-    function getUrisToAudit() view external returns (string [] memory _urisToAudit, bool [] memory _private, string memory _notesUri);
+    function getUrisToAudit() view external returns (AuditUri [] memory _auditUris, string memory _notesUri);
 
     /**
      * @dev this function returns all public data for this audit 
-     * @return _publicDataUris uris to data that is public for this audit
+     * @return _publicAuditUris data that is public for this audit
      */
-    function getPublicData() view external returns (string [] memory _publicDataUris);
+    function getPublicData() view external returns (AuditUri [] memory _publicAuditUris);
 
     /** 
      * @dev this returns the audit seed which contains the primary metadata for this audit
@@ -106,7 +114,7 @@ interface ISEAuditContract {
      * @dev this returns the end time for the audit based on the max window, the audit is expected to end well before this
      * @return _auditEndTime end time for the audit 
      */
-    function getAuditEndTime() view external returns (uint256 _auditEndTime);
+    function getEstimatedAuditEndTime() view external returns (uint256 _auditEndTime);
 
     /**
      * @dev this makes this audit contract's public data public. This can only be executed by the owner and the contract must have a completed audit

@@ -4,8 +4,10 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "./ERC1155.sol";
 
+import "../interfaces/ISEVersionedAddress.sol";
 
-contract SEERC1155 is ERC1155 { 
+contract SEERC1155 is ERC1155, ISEVersionedAddress { 
+    uint256 constant version  = 1;
     string name; 
     string symbol; 
     bool uriSwitchEnabled; 
@@ -29,6 +31,14 @@ contract SEERC1155 is ERC1155 {
 
     function getName() view external returns (string memory _name) {
         return name; 
+    }
+
+    function getVersion() pure external returns (uint256 _version){
+        return version; 
+    }
+
+    function getAdministrator() view external returns (address _administrator) {
+        return administrator;
     }
 
     function getSymbol() view external returns (string memory _symbol) {

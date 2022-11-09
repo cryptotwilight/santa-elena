@@ -13,6 +13,7 @@ interface ISEAuditContractFactory is ISERegistry {
      * @dev this contract is responseible for creating an audit contract based on the given parameters
      * @param _seed primary metadata for the audit contract
      * @param _urisToAudit uris for uploaded files to audit 
+     * @param _uriLabels labels for the uploaded uris 
      * @param _uriPrivacy privacy marker for files to be audited
      * @param _notesUri uri for notes on the uploaded data
      * @param _auditManagerNotification where to send audit manager notifications 
@@ -24,6 +25,7 @@ interface ISEAuditContractFactory is ISERegistry {
 
     function createAuditContract(ISEAuditContract.AuditSeed memory _seed, 
                                                 string[] memory _urisToAudit, 
+                                                string [] memory _uriLabels, 
                                                 bool [] memory _uriPrivacy, 
                                                 string memory _notesUri, 
                                                 address _auditManagerNotification,
