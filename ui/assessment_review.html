@@ -11,8 +11,14 @@
     <link rel="shortcut icon" href="assets/images/logo/favicon.svg" type="image/x-icon">
     <link rel="shortcut icon" href="assets/images/logo/favicon.png" type="image/png">
     
-<link rel="stylesheet" href="assets/css/shared/iconly.css">
-
+    <link rel="stylesheet" href="assets/css/shared/iconly.css">
+    <!-- Web3 -->
+    <link rel="stylesheet" href="assets/css/shared/iconly.css">
+    <script src="https://unpkg.com/ipfs-http-client-lite/dist/index.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ethjs@0.3.4/dist/ethjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 </head>
 
 <body>
@@ -35,6 +41,12 @@
             <div class="sidebar-toggler  x">
                 <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
             </div>
+        </div>
+        <div>
+            <a href="#" id="connect_web3" class="btn btn-primary rounded">Connect Web 3</a>
+        </div>
+        <div>
+            <span id="show_wallet"></span>
         </div>
     </div>
     <div class="sidebar-menu">
@@ -155,6 +167,8 @@
                         <div class="card-header">
                             <h4>Files</h4>
                             <span id="assessment_notes"></span>
+                            <span id="audit_declaration"></span>
+                            <span id="audit_report"></span>
                         </div>
                         <div class="card-body">
                             <div class="card-content">
@@ -181,61 +195,52 @@
                 <div class="col-12 col-xl-4">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Profile Visit</h4>
+                            <h4>Assessment Times</h4>
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-8">
                                     <div class="d-flex align-items-center">
                                         <svg class="bi text-primary" width="32" height="32" fill="blue"
                                             style="width:10px">
                                             <use
                                                 xlink:href="assets/images/bootstrap-icons.svg#circle-fill" />
                                         </svg>
-                                        <h5 class="mb-0 ms-3">Europe</h5>
+                                        <h5 class="mb-0 ms-3">Start Date</h5>
                                     </div>
                                 </div>
-                                <div class="col-6">
-                                    <h5 class="mb-0">862</h5>
-                                </div>
-                                <div class="col-12">
-                                    <div id="chart-europe"></div>
+                                <div class="col-4">
+                                    <h5 class="mb-0"><span id="audit_start_date"></span></h5>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-8">
                                     <div class="d-flex align-items-center">
                                         <svg class="bi text-success" width="32" height="32" fill="blue"
                                             style="width:10px">
                                             <use
                                                 xlink:href="assets/images/bootstrap-icons.svg#circle-fill" />
                                         </svg>
-                                        <h5 class="mb-0 ms-3">America</h5>
+                                        <h5 class="mb-0 ms-3">Estimated End Date</h5>
                                     </div>
                                 </div>
-                                <div class="col-6">
-                                    <h5 class="mb-0">375</h5>
-                                </div>
-                                <div class="col-12">
-                                    <div id="chart-america"></div>
+                                <div class="col-4">
+                                    <h5 class="mb-0"><span id="estimated_audit_end_date"></span></h5>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-8">
                                     <div class="d-flex align-items-center">
-                                        <svg class="bi text-danger" width="32" height="32" fill="blue"
+                                        <svg class="bi text-success" width="32" height="32" fill="blue"
                                             style="width:10px">
                                             <use
                                                 xlink:href="assets/images/bootstrap-icons.svg#circle-fill" />
                                         </svg>
-                                        <h5 class="mb-0 ms-3">Indonesia</h5>
+                                        <h5 class="mb-0 ms-3">Actual Audit End Date</h5>
                                     </div>
                                 </div>
-                                <div class="col-6">
-                                    <h5 class="mb-0">1025</h5>
-                                </div>
-                                <div class="col-12">
-                                    <div id="chart-indonesia"></div>
+                                <div class="col-4">
+                                    <h5 class="mb-0"><span id="audit_end_date"></span></h5>
                                 </div>
                             </div>
                         </div>
@@ -244,48 +249,27 @@
                 <div class="col-12 col-xl-8">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Latest Comments</h4>
+                            <h4>Submit Audit</h4>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-lg">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Comment</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="col-3">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar avatar-md">
-                                                        <img src="assets/images/faces/5.jpg">
-                                                    </div>
-                                                    <p class="font-bold ms-3 mb-0">Si Cantik</p>
-                                                </div>
-                                            </td>
-                                            <td class="col-auto">
-                                                <p class=" mb-0">Congratulations on your graduation!</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="col-3">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar avatar-md">
-                                                        <img src="assets/images/faces/2.jpg">
-                                                    </div>
-                                                    <p class="font-bold ms-3 mb-0">Si Ganteng</p>
-                                                </div>
-                                            </td>
-                                            <td class="col-auto">
-                                                <p class=" mb-0">Wow amazing design! Can you make another tutorial for
-                                                    this design?</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <p class="card-text">
+                                <label for="audit_declaration">Audit Declaration</label>
+                                <select id="audit_declaration" class="form-control">
+                                    <option id="SATISFIED">SATISFIED</option>
+                                    <option id="NOT_SATISFIED">NOT_SATISFIED</option>
+                                </select>
+                            </p>
+                            <p class="card-text">
+                                <label for="audit_report">Upload Audit Report</label>
+                                <!-- Basic file uploader --><br/>
+                                <input type="file" id="audit_report" class="basic-filepond">
+                            </p>
+                            <p class="card-text">
+                                <label for="declaration_seal">Upload Declaration Seal</label>
+                                <!-- Basic file uploader --><br/>
+                                <input type="file" id="declaration_seal" class="basic-filepond">
+                            </p>
+                            <a href="javascript:submitAuditReport()" class="btn btn-danger">Submit Audit</a>
                         </div>
                     </div>
                 </div>
@@ -296,60 +280,16 @@
                 <div class="card-body py-4 px-4">
                     <div class="d-flex align-items-center">
                         <div class="avatar avatar-xl">
-                            <img src="assets/images/faces/1.jpg" alt="Face 1">
+                            <img src="assets/images/faces/1.jpg" alt="Face 1"><!-- replace with seal -->
                         </div>
                         <div class="ms-3 name">
-                            <h5 class="font-bold">John Duck</h5>
-                            <h6 class="text-muted mb-0">@johnducky</h6>
+                            <h5 class="font-bold">Assessmet Declaration</h5>
+                            <h6 class="text-muted mb-0"><span id="assessment_declaration"></span></h6>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-header">
-                    <h4>Recent Messages</h4>
-                </div>
-                <div class="card-content pb-4">
-                    <div class="recent-message d-flex px-4 py-3">
-                        <div class="avatar avatar-lg">
-                            <img src="assets/images/faces/4.jpg">
-                        </div>
-                        <div class="name ms-4">
-                            <h5 class="mb-1">Hank Schrader</h5>
-                            <h6 class="text-muted mb-0">@johnducky</h6>
-                        </div>
-                    </div>
-                    <div class="recent-message d-flex px-4 py-3">
-                        <div class="avatar avatar-lg">
-                            <img src="assets/images/faces/5.jpg">
-                        </div>
-                        <div class="name ms-4">
-                            <h5 class="mb-1">Dean Winchester</h5>
-                            <h6 class="text-muted mb-0">@imdean</h6>
-                        </div>
-                    </div>
-                    <div class="recent-message d-flex px-4 py-3">
-                        <div class="avatar avatar-lg">
-                            <img src="assets/images/faces/1.jpg">
-                        </div>
-                        <div class="name ms-4">
-                            <h5 class="mb-1">John Dodol</h5>
-                            <h6 class="text-muted mb-0">@dodoljohn</h6>
-                        </div>
-                    </div>
-                    <div class="px-4">
-                        <button class='btn btn-block btn-xl btn-outline-primary font-bold mt-3'>Start Conversation</button>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h4>Visitors Profile</h4>
-                </div>
-                <div class="card-body">
-                    <div id="chart-visitors-profile"></div>
-                </div>
-            </div>
+  
         </div>
     </section>
 </div>
@@ -357,7 +297,7 @@
             <footer>
                 <div class="footer clearfix mb-0 text-muted">
                     <div class="float-start">
-                        <p>2021 &copy; Mazer</p>
+                        <p>2022 &copy; Santa Elena</p>
                     </div>
                     <div class="float-end">
                         <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a
@@ -370,9 +310,31 @@
     <script src="assets/js/bootstrap.js"></script>
     <script src="assets/js/app.js"></script>
     
-<!-- Need: Apexcharts -->
-<script src="assets/extensions/apexcharts/apexcharts.min.js"></script>
-<script src="assets/js/pages/dashboard.js"></script>
+    <!-- abi -->
+    <script src="assets/js/web3/abi/i_se_registry_abi.js"></script>
+    <script src="assets/js/web3/abi/i_se_audit_manager_abi.js"></script>
+    <script src="assets/js/web3/abi/i_se_audit_contract_abi.js"></script>
+
+    <!-- Web3 -->
+    <script src="assets/js/web3/connect.js"></script>
+    <script>
+        const assessmentTitle               = ge("assessment_title");
+        const submittedFiles                = ge("submitted_files");
+        const assessmentNotesDisplaySpan    = ge("assessment_notes");
+        const assessmentStatusDisplaySpan   = ge("assessment_status");
+        const ownerNameDisplaySpan          = ge("ownerName");
+        const ownerAddressSpan              = ge("owner");
+        const auditorNameDisplaySpan        = ge("auditorName");
+        const auditorAddressDisplaySpan     = ge("auditor");
+        const auditDeclaration              = ge("audit_declaration");
+        const auditReport                   = ge("audit_report");
+        const estimatedEndDate              = ge("estimated_end_date");
+        const actualEndDate                 = ge("actual_end_date");
+        const urlParams                     = new URLSearchParams(window.location.search); 
+        var assessmentAddress               = urlParams.get("assessment");
+
+
+    </script> 
 
 </body>
 

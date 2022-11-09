@@ -71,6 +71,12 @@
                                 <span>Atheneum</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="https://github.com/cryptotwilight/santa-elena" class='sidebar-link'>
+                                <i class="bi bi bi-github"></i>
+                                <span>Source Code</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -331,10 +337,10 @@
     <script src="assets/js/web3/abi/i_se_registry_abi.js"></script>
     <script src="assets/js/web3/abi/i_se_audit_manager_abi.js"></script>
     <script src="assets/js/web3/abi/i_se_audit_contract_abi.js"></script>
+    <script src="assets/js/web3/connect.js"></script>
 
     <script>
-        const connectBlockchainButton = ge("connect_web3");
-        const showWallet = ge("show_wallet");
+
         const ownerName = ge("owner_name");
         const auditTitle = ge("audit_title");
         const maxAuditWindow = ge("max_audit_window");
@@ -366,80 +372,7 @@
         const web3StorageAPIToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDc3NDZBZDJCYzZjNjUwRTQwMDA5QTU0YjVjNjQ1MjlkZEIzQzg2RGUiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njc5NDY2MjIwOTEsIm5hbWUiOiJzb2NpYWwgaG91ciJ9.ZLhXsvFSWRmQ6YtsheYkknSwXPLsnIuI9NKwL7y7JLQ"; 
         const nftStorageAPIRoot = ""; 
         const nftstorageAPIToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweENGNkM5OTY4NTY0NjMwYzhGMGZjZDlDOGExMzBCM2JkRWYzQkJBOTIiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY2Nzg2NzU1OTE0MCwibmFtZSI6InNvY2lhbGhvdXIifQ.fJ2vl_v6-oaYRU5FZztpyqwh6HaZXHH5lDUndxOMNF0";
-        const web3 = new Web3(window.ethereum);
-
-
-
-        var account;
-        //Created check function to see if the MetaMask extension is installed
-        const isMetaMaskInstalled = () => {
-
-            const {
-                ethereum
-            } = window;
-            return Boolean(ethereum && ethereum.isMetaMask);
-        };
-
-        const MetaMaskClientCheck = () => {
-            //Now we check to see if Metmask is installed
-            if (!isMetaMaskInstalled()) {
-                console.log("metamask not installed");
-                //If it isn't installed we ask the user to click to install it
-                connectBlockchainButton.innerText = 'Click here to install MetaMask!';
-                //When the button is clicked we call this function
-                connectBlockchainButton.onclick = onClickInstall;
-                //The button is now disabled
-                connectBlockchainButton.disabled = false;
-            } else {
-                //If it is installed we change our button text
-                connectBlockchainButton.innerText = 'Click to Connect Metamask';
-
-                console.log("metamask installed");
-                connectBlockchainButton.addEventListener('click', () => {
-                    getAccount();
-                    connectBlockchainButton.innerText = "Web 3 Connected";
-
-                });
-            }
-        };
-        const initialize = () => {
-            MetaMaskClientCheck();
-
-        };
-
-        window.addEventListener('DOMContentLoaded', initialize);
-
-        async function getAccount() {
-            const accounts = await ethereum.request({
-                method: 'eth_requestAccounts'
-            });
-            account = accounts[0];
-            showWallet.innerHTML = "<small>Wallet :: " + account + "</small>";
-            loadContracts();
-        }
-
-        //We create a new MetaMask onboarding object to use in our app
-        //const onboarding = new MetaMaskOnboarding({ forwarderOrigin });
-
-        //This will start the onboarding proccess
-        const onClickInstall = () => {
-            connectBlockchainButton.innerText = 'Onboarding in progress';
-            connectBlockchainButton.disabled = true;
-            //On this object we have startOnboarding which will start the onboarding process for our end user
-            // open link to download metamask
-        };
-
-        const onClickConnect = async() => {
-            try {
-                // Will open the MetaMask UI
-                // You should disable this button while the request is pending!
-                await ethereum.request({
-                    method: 'eth_requestAccounts'
-                });
-            } catch (error) {
-                console.error(error);
-            }
-        };
+  
 
         const iSERegistryAddress = "0x8425bf71B1Aa58123e187895a05c484CA918779c"; 
         var iSERegistryContract;
