@@ -24,3 +24,7 @@ The Smart Contracts for Santa Elena are deployed on the Goerlie Testnet and can 
 |Santa Elena Audit Submission Proof Contract 	 |0xCf056cf3aEDc84C72EBD7c1eDc6155eC938fcB9e |1 		 |
 ## Demo UI
 The demonstration UI is deployed at the following address:
+https://fragrant-hat-0277.on.fleek.co/
+
+## Youtube Explainer 
+https://youtu.be/R2mulX_f0GA
