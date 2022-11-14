@@ -3,9 +3,10 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 
-import "../interfaces/ISERegistryLite.sol";
+import "../interfaces/ISERegistry.sol";
 import "../interfaces/ISEVersionedAddress.sol";
 import "../interfaces/ISEAuditContractFactory.sol";
+import "../interfaces/ISEAuditManagerNotification.sol";
 
 import "./SEAuditContract.sol";
 
@@ -13,16 +14,21 @@ import "./SEAuditContract.sol";
 contract SEAuditContractFactory is ISEAuditContractFactory, ISEVersionedAddress { 
 
     address administrator; 
-    ISERegistryLite registry; 
+    ISERegistry registry; 
+    address self; 
+
+    string constant SANTA_ELENA_REGISTRY_CA         = "RESERVED_SANTA_ELENA_REGISTRY";
+    string constant SANTA_ELENA_AUDIT_MANAGER_CA    = "RESERVED_SANTA_ELENA_AUDIT_MANAGER";
  
     mapping(address=>bool) knownAuditContract; 
 
-    string constant name = "SANTA_ELENA_AUDIT_CONTRACT_FACTORY"; 
-    uint256 constant version = 1;
+    string constant name                            = "RESERVED_SANTA_ELENA_AUDIT_CONTRACT_FACTORY"; 
+    uint256 constant version = 14;
 
     constructor(address _administrator, address _registry){
         administrator = _administrator; 
-        registry = ISERegistryLite(_registry);
+        registry = ISERegistry(_registry);
+        self = address(this);
     }
 
     function getName() pure external returns (string memory _name){
@@ -34,6 +40,9 @@ contract SEAuditContractFactory is ISEAuditContractFactory, ISEVersionedAddress 
     }
 
     function isKnown(address _auditContract) view  external returns (bool _isKnown) {
+        if(_auditContract == self) {
+            return true; 
+        }
         return knownAuditContract[_auditContract];
     }
 
@@ -42,27 +51,27 @@ contract SEAuditContractFactory is ISEAuditContractFactory, ISEVersionedAddress 
                                                     string [] memory _uriLabels, 
                                                     bool [] memory _uriPrivacy,                                                     
                                                     string memory _notesUri, 
-                                                    address _auditManagerNotification,
-                                                    address _minter, 
                                                     address _uploadProofErc1155, 
                                                     uint256 _uploadProofNftId) external returns (address _auditContract){
-                    require(msg.sender == registry.getAddress("SANTA_ELENA_AUDIT_MANAGER"), "Santa Elena Audit Manager only");
-                    _auditContract = address(new SEAuditContract( _seed, 
-                                                            _urisToAudit,
-                                                            _uriLabels, 
-                                                            _uriPrivacy, 
-                                                            _notesUri,
-                                                            _auditManagerNotification,
-                                                            _minter, 
-                                                            _uploadProofErc1155,
-                                                            _uploadProofNftId));  
-                    knownAuditContract[_auditContract] = true;    
+
+                    address auditManagerAddress_ = registry.getAddress(SANTA_ELENA_AUDIT_MANAGER_CA);
+                    require(msg.sender == auditManagerAddress_ || msg.sender == administrator, "Santa Elena Audit Manager only");
+                    _auditContract = address(new SEAuditContract(   _seed, 
+                                                                    _urisToAudit,
+                                                                    _uriLabels, 
+                                                                    _uriPrivacy, 
+                                                                    _notesUri,
+                                                                    address(registry),
+                                                                    _uploadProofErc1155,
+                                                                    _uploadProofNftId));  
+                    knownAuditContract[_auditContract] = true;   
+                    ISEAuditManagerNotification(auditManagerAddress_).notifyStatus(_auditContract, ISEAuditContract(_auditContract).getStatus());
                     return _auditContract;                     
     }
     
     function notifyChangeOfAddress() external returns (bool _notified) {
         adminOnly(); 
-        registry = ISERegistryLite(registry.getAddress("SANTA_ELENA_REGISTRY")); 
+        registry = ISERegistry(registry.getAddress(SANTA_ELENA_REGISTRY_CA)); 
         return true; 
     }
 

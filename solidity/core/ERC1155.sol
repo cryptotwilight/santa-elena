@@ -179,7 +179,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         }
         _balances[id][to] += amount;
 
-       // emit TransferSingle(operator, from, to, id, amount);
+       
 
         _afterTokenTransfer(operator, from, to, ids, amounts, data);
 
@@ -222,7 +222,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
             _balances[id][to] += amount;
         }
 
-      //  emit TransferBatch(operator, from, to, ids, amounts);
+
 
         _afterTokenTransfer(operator, from, to, ids, amounts, data);
 
@@ -278,7 +278,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         _beforeTokenTransfer(operator, address(0), to, ids, amounts, data);
 
         _balances[id][to] += amount;
-    //    emit TransferSingle(operator, address(0), to, id, amount);
+    
 
         _afterTokenTransfer(operator, address(0), to, ids, amounts, data);
 
@@ -313,7 +313,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
             _balances[ids[i]][to] += amounts[i];
         }
 
-    //    emit TransferBatch(operator, address(0), to, ids, amounts);
+    
 
         _afterTokenTransfer(operator, address(0), to, ids, amounts, data);
 
@@ -349,7 +349,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
             _balances[id][from] = fromBalance - amount;
         }
 
-    //    emit TransferSingle(operator, from, address(0), id, amount);
+    
 
         _afterTokenTransfer(operator, from, address(0), ids, amounts, "");
     }
@@ -386,7 +386,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
             }
         }
 
-    //    emit TransferBatch(operator, from, address(0), ids, amounts);
+    
 
         _afterTokenTransfer(operator, from, address(0), ids, amounts, "");
     }
@@ -403,7 +403,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
     ) internal virtual {
         require(owner != operator, "ERC1155: setting approval status for self");
         _operatorApprovals[owner][operator] = approved;
-    //    emit ApprovalForAll(owner, operator, approved);
+    
     }
 
     /**

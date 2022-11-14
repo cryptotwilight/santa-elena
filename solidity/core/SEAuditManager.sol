@@ -1,19 +1,24 @@
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
+pragma experimental ABIEncoderV2;
 
 import "../interfaces/ISEAuditManager.sol";
 import "../interfaces/ISEAuditManagerNotification.sol";
 import "../interfaces/ISEAuditContractFactory.sol";
 import "../interfaces/ISEMinter.sol";
-import "../interfaces/ISERegistryLite.sol";
+import "../interfaces/ISERegistry.sol";
 import "../interfaces/ISEVersionedAddress.sol";
 
 contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVersionedAddress { 
 
-    string constant name = "SANTA_ELENA_AUDIT_MANAGER";
-    uint256 constant version = 1; 
-    ISERegistryLite registry; 
+    string constant name = "RESERVED_SANTA_ELENA_AUDIT_MANAGER";
+    uint256 constant version = 14; 
+
+    string constant SANTA_ELENA_REGISTRY_CA                 = "RESERVED_SANTA_ELENA_REGISTRY";
+    string constant SANTA_ELENA_AUDIT_CONTRACT_FACTORY_CA   = "RESERVED_SANTA_ELENA_AUDIT_CONTRACT_FACTORY";
+    string constant SANTA_ELENA_NFT_MINTER_CA               = "RESERVED_SANTA_ELENA_MINTER";
+    ISERegistry registry; 
     ISEAuditContractFactory factory; 
     ISEMinter minter;
     
@@ -26,9 +31,9 @@ contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVers
 
     constructor(address _administrator, address _registry) {
         administrator = _administrator; 
-        registry = ISERegistryLite(_registry); 
-        factory = ISEAuditContractFactory(registry.getAddress("SANTA_ELENA_AUDIT_CONTRACT_FACTORY"));
-        minter = ISEMinter(registry.getAddress("SANTA_ELENA_NFT_MINTER"));
+        registry = ISERegistry(_registry); 
+        factory = ISEAuditContractFactory(registry.getAddress(SANTA_ELENA_AUDIT_CONTRACT_FACTORY_CA));
+        minter = ISEMinter(registry.getAddress(SANTA_ELENA_NFT_MINTER_CA));
         self = address(this);
     }
 
@@ -40,9 +45,11 @@ contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVers
         return version; 
     }
 
-    function uploadFiles(ISEAuditContract.AuditSeed memory _seed, string [] memory _urisToAudit, string [] memory _uriLabels, bool [] memory _private, string memory _notesUri, string memory manifestUri) external returns (address _auditContract){
+
+    function uploadFiles(string memory _ownerName, string memory _auditTitle, uint256 _maxAuditWindow, string [] memory _urisToAudit, string [] memory _uriLabels, bool [] memory _private, string memory _notesUri, string memory manifestUri) external returns (address _auditContract){
+        ISEAuditContract.AuditSeed memory _seed = generateSeed(_ownerName, msg.sender, _auditTitle, block.timestamp, _maxAuditWindow, 0,0,0,0,address(0),"");
         (address erc1155_, uint256 nftId_) = minter.mintUploadProof(msg.sender, manifestUri);
-        _auditContract = factory.createAuditContract(_seed, _urisToAudit, _uriLabels,  _private, _notesUri, self, address(minter), erc1155_,nftId_ );    
+        _auditContract = factory.createAuditContract(_seed, _urisToAudit, _uriLabels,  _private, _notesUri, erc1155_,nftId_ );    
         auditContractsByStatus["READY"].push(_auditContract);
         auditContractsByUser[msg.sender].push(_auditContract);
         return _auditContract;
@@ -88,22 +95,53 @@ contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVers
 
     function notifyStatus(address _auditContract, string memory _status) external returns (bool _recieved){
         require(factory.isKnown(msg.sender), " unknown address ");
-        string memory status_ = currentStatusByAuditContractAddress[_auditContract];
-        address [] memory acs_ = auditContractsByStatus[status_];
-        auditContractsByStatus[status_] = remove(acs_, _auditContract);
-        auditContractsByStatus[_status].push(_auditContract);
+        if(!equal(_status, "AWAITING_AUDIT")){        
+            string memory status_ = currentStatusByAuditContractAddress[_auditContract];
+            address [] memory acs_ = auditContractsByStatus[status_];
+            auditContractsByStatus[status_] = remove(acs_, _auditContract);            
+        }
+        auditContractsByStatus[_status].push(_auditContract);        
+        currentStatusByAuditContractAddress[_auditContract] = _status; 
         return true; 
     }
 
     function notifyChangeOfAddress() external returns (bool _notified) {
         adminOnly(); 
-        registry = ISERegistryLite(registry.getAddress("SANTA_ELENA_REGISTRY")); 
-        factory = ISEAuditContractFactory(registry.getAddress("SANTA_ELENA_AUDIT_CONTRACT_FACTORY"));
-        minter = ISEMinter(registry.getAddress("SANTA_ELENA_MINTER"));
+        registry = ISERegistry(registry.getAddress(SANTA_ELENA_REGISTRY_CA)); 
+        factory = ISEAuditContractFactory(registry.getAddress(SANTA_ELENA_AUDIT_CONTRACT_FACTORY_CA));
+        minter = ISEMinter(registry.getAddress(SANTA_ELENA_NFT_MINTER_CA));
         return true; 
     }
 
 //================================================ INTERNAL =========================================================================================
+        function generateSeed(       
+        string memory _ownerName,
+        address _owner,        
+        string memory _auditTitle,        
+        uint256 _uploadDate,        
+        uint256 _maxAuditWindow,        
+        uint256 _auditStart,         
+        uint256 _auditDate,        
+        uint256 _publishDate,         
+        uint256 _expires,        
+        address _auditor,         
+        string memory _auditorName ) pure internal returns (ISEAuditContract.AuditSeed memory _seed){
+            return  ISEAuditContract.AuditSeed({
+                                                ownerName      : _ownerName,
+                                                owner          :  _owner, 
+                                                auditTitle     : _auditTitle, 
+                                                uploadDate     : _uploadDate,         
+                                                maxAuditWindow : _maxAuditWindow, 
+                                                auditStart     : _auditStart,  
+                                                auditDate      : _auditDate,         
+                                                publishDate    : _publishDate, 
+                                                expires        : _expires ,
+                                                auditor        : _auditor,         
+                                                auditorName    : _auditorName 
+                                            });
+                                
+        }
+    
     function adminOnly() view internal returns (bool _admin) { 
         require(msg.sender == administrator, " admin only ");
         return true; 
@@ -114,11 +152,15 @@ contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVers
     }
 
     function remove(address [] memory a, address b) pure internal returns ( address [] memory c) {
+
         c = new address[](a.length-1);
-        uint256 y = 0; 
+        uint256 y = 0;         
         for(uint256 x = 0; x < a.length; x++){
             address d = a[x];
-            if(d != b) {
+            if(d != b) {   
+                if(y == c.length){
+                    return a; // element not found 
+                }            
                 c[y] = d;
                 y++;
             }

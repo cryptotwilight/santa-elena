@@ -184,6 +184,7 @@
                                             <th>File Count</th>
                                             <th>Audit End Date</th>
                                             <th>Status</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -193,6 +194,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="row">
+                    <span id="audit_messages"></span>
             </div>
             <div class="row">
                 <div class="col-12">
@@ -254,11 +258,16 @@
     <script> 
         const outstandingAssessmentsTable = ge("outstanding_assessments_table");
         const assessmentsAvailableForAuditTable = ge("assessments_available_for_audit");
+        const auditMessages = ge("audit_messages");
        
         const totalAudits = ge("total_audits");
         const totalFilesUploaded = ge("total_files_uploaded");
         const successfulAudits = ge("successful_audits");
         const carbonOffset  = ge("carbon_offset");
+
+        function loadPage() {
+            displayAssessments();
+        }
 
         function loadStats() { 
 
@@ -271,14 +280,16 @@
         }
     
         function buildOutstandingAssessmentsTable() {
-            outstandingAssessmentsTable.innerHTML = "";  
+            var tbody = outstandingAssessmentsTable.getElementsByTagName("tbody")[0];
+            tbody.innerHTML = ""; 
             sEAuditManagerContract.methods.getContractsUnderAuditor(account).call({from : account})
             .then(function(response){
                 console.log(response);
                 var auditAddressList = response; 
                 for(var x = 0; x < response.length; x++){
                     var auditAddress = auditAddressList[x];
-                    buildOARow(auditAddress);
+                    var row = tbody.insertRow(); 
+                    buildOARow(auditAddress, row);
                 }
             })
             .catch(function(err){
@@ -287,14 +298,16 @@
         }
 
         function buildAvailableAssessmentsTable() { 
-            assessmentsAvailableForAuditTable.innerHTML = "";
+            var tbody = assessmentsAvailableForAuditTable.getElementsByTagName("tbody")[0];
+            tbody.innerHTML = "";
             sEAuditManagerContract.methods.getAuditContractsWithStatus("READY").call({from : account})
             .then(function(response){
                 console.log(response);
                 var auditAddressList = response; 
                 for(var x = 0; x < response.length; x++){
                     var auditAddress = auditAddressList[x];
-                    buildAARow(auditAddress);
+                    var row = tbody.insertRow(); 
+                    buildAARow(auditAddress, row);
                 }
             })
             .catch(function(err){
@@ -302,9 +315,8 @@
             })
         }
 
-        function buildOARow(auditAddress) {
-            var auditContract = getContract(iSEAuditContractAbi, auditAddress);
-            var row = outstandingAssessmentsTable.tbodies[0].insertRow(); 
+        function buildOARow(auditAddress, row) {
+            var auditContract = getContract(iSEAuditContractAbi, auditAddress);            
 
             var titleCell             = row.insertCell();
             titleCell.setAttribute("class","text-bold-500");
@@ -330,11 +342,20 @@
 
                 setEstimatedAuditEndDate(auditContract, auditEndDateCell);
                 
-                setStatus(auditContract, statusCell)
+                setStatus(auditContract, statusCell);
+            
             })
             .catch(function(err){
                 console.log(err);
             })
+        }
+
+        function populateBookingCell(bookingCell, auditAddress){
+            var a = ce("a");
+            a.setAttribute("href", "javascript:bookForAudit(auditAddress);");
+            a.setAttribute("class", "btn btn-warning");
+            a.append(text("book for audit"));
+            bookingCell.append(a);
         }
 
         function setFileCount(auditContract, fileCountCell){
@@ -359,7 +380,6 @@
             })
         }
 
-
         function setStatus(auditContract, statusCell) {
             auditContract.methods.getStatus().call({from : account})
            .then(function(response){
@@ -369,12 +389,11 @@
            .catch(function(err){
                 console.log(err);
            });
-        }
+        }        
 
 
-        function buildAARow(auditAddress) {
-            var auditContract = getContract(iSEAuditContractAbi, auditAddress);
-            var row = assessmentsAvailableForAuditTable.tbodies[0].insertRow(); 
+        function buildAARow(auditAddress, row) {
+            var auditContract = getContract(iSEAuditContractAbi, auditAddress);            
 
             var titleCell               = row.insertCell();
             titleCell.setAttribute("class","text-bold-500");
@@ -382,16 +401,18 @@
             var fileCountCell           = row.insertCell(); 
             var maxAuditPeriodCell      = row.insertCell(); 
             var statusCell              = row.insertCell();             
+            var bookingCell           = row.insertCell();
 
             auditContract.methods.getAuditSeed().call({from : account })
             .then(function(response){
+                var seed = response; 
                 var a = ce("a");
-                a.setAttribute("href", "assessment_review.html?assessment="+auditAddress);
+                a.setAttribute("href", "assessment_review.html?auditContract="+auditAddress);
                 a.append(text(seed.auditTitle));
                 titleCell.append(a);
                 
                 ownerCell.append(text(seed.ownerName));
-                ownerCell.append(ce(br));
+                ownerCell.append(ce("br"));
                 var small = ce("small");
                 small.append(text(seed.owner)); 
                 ownerCell.append(small);
@@ -401,10 +422,15 @@
                 maxAuditPeriodCell.append(text(seed.maxAuditWindow + " days "));
                 
                 setStatus(auditContract, statusCell);
+                populateBookingCell(bookingCell, auditAddress);
             })
             .catch(function(err){
                 console.log(err);
             })
+        }
+
+        function bookForAudit(auditContractAddress) {
+
         }
     </script>
 </body>

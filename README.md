@@ -12,15 +12,16 @@ Web3.storage is used to store the uploaded files for the assessment.
 
 ## Deployed Contracts 
 The Smart Contracts for Santa Elena are deployed on the Goerlie Testnet and can be accessed at the following addresses
-|Contract 										                 |Address 									                 |Version|
-|----------------------------------------------|-------------------------------------------|-------|
-|Santa Elena Registry 							           |0x8425bf71B1Aa58123e187895a05c484CA918779c |1 		 |
-|Santa Elena Audit Manager 						         |0x15bba6B33c131042e97Dde3453a3993845f96FE4 |1 		 |
-|												                       | 											                     |       |
-|Santa Elena Contract Factory 					       |0x482969141f1aA8d9a0cb7b084a3122972195C86d |1 		 |
-|Santa Elena Minter 							             |0xa5c309FE770657F420Ea9cfEF7e788F2427AD02f |1 		 |
-|Santa Elena Audit Declaration NFT Contract 	 |0xC0231f71c305fC9fEa14D95CC6E61D464C627823 |1 		 |
-|Santa Elena Upload Proof Contract 				     |0x703Bfd0f6B545aC5178137956f7c6cfa5a3a779e |1 		 |
-|Santa Elena Audit Submission Proof Contract 	 |0xCf056cf3aEDc84C72EBD7c1eDc6155eC938fcB9e |1 		 |
+|Contract 									     |Address 		  		                   |Version|
+|------------------------------------------------|-------------------------------------------|-----|
+|Santa Elena Registry 							 |0xF5C41b43F1E7B39Ae5b5B01194f1a6E6D40955A4 |5    |
+|Santa Elena Audit Manager 						 |0xdAC3ED6Cb8b31cE2aC2cBC3129902fF44FcCb3c9 |14   |
+|												 | 									         |     |
+|Santa Elena Contract Factory 					 |0xcCDBD469Aa61a1c179473fC2dfF14758baAcAf86 |14   |
+|Santa Elena Minter 							 |0xb82fac32c597FD00ec3f11986b60874ff81D3E08 |3    |
+|Santa Elena Audit Declaration NFT Contract 	 |0x2893c3D8Caa08D34681223066D44985cC86E481f |3    |
+|Santa Elena Upload Proof Contract 				 |0xc117c3B1D09b6F1926797eAf359fE9e270A5DC8E |3    |
+|Santa Elena Audit Submission Proof Contract 	 |0x514C57487B1D61d7CDB2d82206B1F60d1c886908 |3    |
+
 ## Demo UI
 The demonstration UI is deployed at the following address:

@@ -2,15 +2,17 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/c7315e8779dd4ca363bef85d6c3a455e83fb574e/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/b2970b96e5e2be297421cd7690e3502e49f7deff/contracts/token/ERC1155/IERC1155Receiver.sol"; 
+
 
 import "../interfaces/ISEMinter.sol";
-
+import "../interfaces/ISERegistry.sol";
+import "../interfaces/ISEVersionedAddress.sol";
 import "../interfaces/ISEAuditContract.sol";
 import "../interfaces/ISEAuditManagerNotification.sol";
 
 
-contract SEAuditContract is ISEAuditContract { 
+contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Receiver { 
     
     address self; 
     struct Proof {
@@ -30,29 +32,31 @@ contract SEAuditContract is ISEAuditContract {
     string [] uris; 
     string notesUri;
 
-    
+    string constant name = "SANTA ELENA AUDIT CONTRACT";
+    uint256 constant version = 10; 
+
+    string constant SANTA_ELENA_NOTIFICATION_CA = "RESERVED_SANTA_ELENA_AUDIT_MANAGER"; 
+    string constant SANTA_ELENA_MINTER_CA = "RESERVED_SANTA_ELENA_MINTER";
 
     AuditSeed seed; 
-    ISEAuditManagerNotification notifier; 
-    ISEMinter minter;
+    ISERegistry registry; 
 
     constructor(AuditSeed memory _seed, 
                 string[] memory _urisToAudit,
                 string [] memory _uriLabels,  
                 bool [] memory _uriPrivacy, 
                 string memory _notesUri, 
-                address _auditManagerNotification,
-                address _minter, 
+                address _register, 
                 address _uploadProofErc1155, 
                 uint256 _uploadProofNftId) {
+
         self = address(this);
         seed = _seed; 
-        notifier = ISEAuditManagerNotification(_auditManagerNotification);
+        registry = ISERegistry(_register);         
         uris = _urisToAudit; 
         mapAuditUris(_urisToAudit, _uriLabels, _uriPrivacy);
         notesUri = _notesUri;
-        state = AUDIT_STATE.READY;
-        minter = ISEMinter(_minter);
+        state = AUDIT_STATE.READY;        
         for(uint256 x =0; x < _urisToAudit.length; x++){
             if(_uriPrivacy[x]) {
                 auditUriByPrivacy[true].push(_urisToAudit[x]);
@@ -69,10 +73,41 @@ contract SEAuditContract is ISEAuditContract {
         proofByPROOF[PROOF.UPLOAD] = proof_;
     }
 
+    function getName() pure external returns (string memory _name) {
+        return name; 
+    }
+
+    function getVersion() pure external returns (uint256 _version) {
+        return version; 
+    }
+
     function getStatus() view external returns (string memory _status){
         return getStatusInternal(); 
     }
+    
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 id,
+        uint256 value,
+        bytes calldata data
+    ) external returns (bytes4){
+        return bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"));
+    }
 
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+    ) external returns (bytes4){
+        return bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"));
+    }
+
+    function supportsInterface(bytes4 interfaceId) external view returns (bool){
+        return true; 
+    }
 
     function getAuditReport() view external returns (string memory _auditReportUri, AUDIT_DECLARATION _declaration){
         return (auditReport, declaration); 
@@ -86,22 +121,26 @@ contract SEAuditContract is ISEAuditContract {
 
     function submitAuditReport( string memory _auditReportUri, 
                                 AUDIT_DECLARATION _declaration, 
-                                string memory _auditorSealUri, string memory _manifestUri) external returns (bool _submitted){
+                                string memory _auditorSealUri, string memory _auditSubmissionManifestUri) external returns (bool _submitted){
         require(msg.sender == seed.auditor, " auditor only ");
         auditReport = _auditReportUri;
         declaration = _declaration;
         seed.auditDate = block.timestamp; 
+        updateSeed(seed.ownerName, seed.owner, seed.auditTitle, seed.uploadDate, 
+                    seed.maxAuditWindow, seed.auditStart, block.timestamp, 0, seed.expires, seed.auditor, seed.auditorName );
         state = AUDIT_STATE.AUDIT_COMPLETE;
         // mint 
-        minter.mintDeclaration(_auditorSealUri, self);
-        (address erc1155_, uint256 nftId_) = minter.mintAuditSubmissionProof(msg.sender, _manifestUri);
+        ISEMinter minter_ = ISEMinter(registry.getAddress(SANTA_ELENA_MINTER_CA)); 
+        minter_.mintDeclaration(_auditorSealUri, self);
+        (address erc1155_, uint256 nftId_) = minter_.mintAuditSubmissionProof(msg.sender, _auditSubmissionManifestUri);
+
         Proof memory proof_ = Proof ({
                                     proof : PROOF.AUDIT,
                                     erc1155 : erc1155_,
                                     nftId : nftId_
                                 });
         proofByPROOF[PROOF.AUDIT] = proof_;
-        notifier.notifyStatus(self, getStatusInternal());
+        ISEAuditManagerNotification(registry.getAddress(SANTA_ELENA_NOTIFICATION_CA)).notifyStatus(self, getStatusInternal());
         return true; 
     }
 
@@ -121,7 +160,7 @@ contract SEAuditContract is ISEAuditContract {
         require(msg.sender == seed.owner, " owner only ");
         require(state == AUDIT_STATE.AUDIT_COMPLETE, " no complete audit ");
         state = AUDIT_STATE.PUBLIC;
-        notifier.notifyStatus(self, getStatusInternal());
+        ISEAuditManagerNotification(registry.getAddress(SANTA_ELENA_NOTIFICATION_CA)).notifyStatus(self, getStatusInternal());
         return true; 
     }
 
@@ -129,10 +168,13 @@ contract SEAuditContract is ISEAuditContract {
         require(state != AUDIT_STATE.AUDIT_COMPLETE, " audit already completed ");
         require(state != AUDIT_STATE.BOOKED_FOR_AUDIT || isAuditTimeExpired(), " booking not available ");
         state = AUDIT_STATE.BOOKED_FOR_AUDIT;
-        seed.auditorName = _auditorName; 
-        seed.auditor = msg.sender;
-        seed.auditStart = block.timestamp; 
-        notifier.notifyStatus(self, getStatusInternal());
+        uint256 expiry_ = block.timestamp + seed.maxAuditWindow;
+        updateSeed(seed.ownerName, seed.owner, seed.auditTitle, seed.uploadDate, 
+                    seed.maxAuditWindow, block.timestamp, 0, 0, expiry_, msg.sender, _auditorName );
+
+        
+        string memory status_ = getStatusInternal(); 
+        ISEAuditManagerNotification(registry.getAddress(SANTA_ELENA_NOTIFICATION_CA)).notifyStatus(self,status_ );
         return true; 
     }
   
@@ -146,9 +188,28 @@ contract SEAuditContract is ISEAuditContract {
 
     //==================================== INTERNAL ====================================================================================
 
+    function updateSeed(string memory _ownerName, address _owner,  string memory _auditTitle, uint256 _uploadDate,        
+                        uint256 _maxAuditWindow,  uint256 _auditStart,  uint256 _auditDate, 
+                        uint256 _publishDate, uint256 _expires, address _auditor,  string memory _auditorName ) internal returns (bool updated ){
+        seed = AuditSeed({
+                        ownerName      :  _ownerName,      
+                        owner          :  _owner,       
+                        auditTitle     :  _auditTitle,
+                        uploadDate     :  _uploadDate,       
+                        maxAuditWindow :  _maxAuditWindow,
+                        auditStart     :  _auditStart,
+                        auditDate      :  _auditDate,    
+                        publishDate    :  _publishDate,
+                        expires        :  _expires,        
+                        auditor        :  _auditor, 
+                        auditorName    :  _auditorName
+        });
+        return true; 
+    }  
+
     function getStatusInternal() view internal returns ( string memory _status) {
         if(state == AUDIT_STATE.AUDIT_COMPLETE){
-            return "AUDIT_COMPETE";
+            return "AUDIT_COMPLETE";
         }
 
         if(state == AUDIT_STATE.BOOKED_FOR_AUDIT){

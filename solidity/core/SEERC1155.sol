@@ -5,22 +5,30 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./ERC1155.sol";
 
 import "../interfaces/ISEVersionedAddress.sol";
+import "../interfaces/ISERegistry.sol";
 
 contract SEERC1155 is ERC1155, ISEVersionedAddress { 
-    uint256 constant version  = 1;
+    uint256 constant version  = 3;
     string name; 
+
+    string constant SANTA_ELENA_REGISTRY_CA = "RESERVED_SANTA_ELENA_REGISTRY";
+    string constant SANTA_ELENA_AUTHORISED_MINTER_CA = "RESERVED_SANTA_ELENA_MINTER";
+
     string symbol; 
-    bool uriSwitchEnabled; 
+    
     address administrator; 
+
+    ISERegistry registry; 
+
     mapping(uint256=>string) uriByNftId; 
     address authorisedMinter; 
 
-    constructor(address _administrator, 
+    constructor(address _administrator, address _registry, 
                 string memory _defaultUri, 
-                bool _uriSwitchEnabled, string memory _name, string memory _symbol) ERC1155(_defaultUri) {
+                string memory _name, string memory _symbol) ERC1155(_defaultUri) {
         
+        registry = ISERegistry(_registry);
         administrator = _administrator; 
-        uriSwitchEnabled = _uriSwitchEnabled; 
         name = _name; 
         symbol = _symbol; 
     }
@@ -46,34 +54,18 @@ contract SEERC1155 is ERC1155, ISEVersionedAddress {
     }
 
     function uri(uint256 _nftId) public view override returns (string memory){ 
-        if(uriSwitchEnabled){
-            return uriByNftId[_nftId];
-        }
-        return super.uri(_nftId);
+        return uriByNftId[_nftId];            
     }
 
-    function mint(address _to, string memory _uri) external returns(uint256 _nftId) {
-        authorisedMinterOnly();
-        require(uriSwitchEnabled, "URI switching NOT enabled");
+    function mint(address _to, string memory _uri) external returns(uint256 _nftId) {       
+        authorisedMinterOnly();   
+        require(_to != address(0), " zero address ");
+        require(!equal(_uri, ""), " empty uri ");     
         _nftId = getIndex(); 
         uriByNftId[_nftId] = _uri; 
-        super._mint(_to,_nftId, 1, bytes(_uri)); 
+        super._mint(_to,_nftId, 1, bytes(hex"01020304")); 
         return _nftId; 
     }   
-
-    function mint(address _to) external returns (uint256 _nftId){
-        authorisedMinterOnly();
-        require(!uriSwitchEnabled, "URI switching ENABLED");
-        _nftId = getIndex(); 
-        super._mint(_to,_nftId, 1, bytes(""));       
-        return _nftId; 
-    }
-
-    function setAuthorisedMinter(address _minter) external returns (bool _set) {
-        adminOnly(); 
-        authorisedMinter = _minter; 
-        return true; 
-    }
 
     //======================================= INTERNAL =============================================
     function adminOnly() view internal returns (bool _admin) {
@@ -81,8 +73,12 @@ contract SEERC1155 is ERC1155, ISEVersionedAddress {
         return true; 
     }
 
+    function equal(string memory _a, string memory _b) pure internal returns (bool _equal) {
+        return keccak256(abi.encodePacked(_a)) == keccak256(abi.encodePacked(_b));
+    }
+
     function authorisedMinterOnly() view internal returns (bool _admin) {
-        require(msg.sender == authorisedMinter, " authorised minter only ");
+        require(msg.sender == registry.getAddress(SANTA_ELENA_AUTHORISED_MINTER_CA), " authorised minter only ");
         return true; 
     }
 

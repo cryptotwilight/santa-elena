@@ -1,5 +1,42 @@
 iSEAuditManagerAbi = [
 	{
+		"inputs": [],
+		"name": "notifyChangeOfAddress",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "_notified",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_auditContract",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_status",
+				"type": "string"
+			}
+		],
+		"name": "notifyStatus",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "_recieved",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -14,6 +51,60 @@ iSEAuditManagerAbi = [
 		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_ownerName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_auditTitle",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_maxAuditWindow",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_urisToAudit",
+				"type": "string[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_uriLabels",
+				"type": "string[]"
+			},
+			{
+				"internalType": "bool[]",
+				"name": "_private",
+				"type": "bool[]"
+			},
+			{
+				"internalType": "string",
+				"name": "_notesUri",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "manifestUri",
+				"type": "string"
+			}
+		],
+		"name": "uploadFiles",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "_auditContract",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -122,144 +213,6 @@ iSEAuditManagerAbi = [
 			}
 		],
 		"stateMutability": "pure",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "notifyChangeOfAddress",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "_notified",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_auditContract",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "_status",
-				"type": "string"
-			}
-		],
-		"name": "notifyStatus",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "_recieved",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"components": [
-					{
-						"internalType": "string",
-						"name": "ownerName",
-						"type": "string"
-					},
-					{
-						"internalType": "address",
-						"name": "owner",
-						"type": "address"
-					},
-					{
-						"internalType": "string",
-						"name": "auditTitle",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "uploadDate",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "maxAuditWindow",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "auditStart",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "auditDate",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "publishDate",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "expires",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "auditor",
-						"type": "address"
-					},
-					{
-						"internalType": "string",
-						"name": "auditorName",
-						"type": "string"
-					}
-				],
-				"internalType": "struct ISEAuditContract.AuditSeed",
-				"name": "_seed",
-				"type": "tuple"
-			},
-			{
-				"internalType": "string[]",
-				"name": "_urisToAudit",
-				"type": "string[]"
-			},
-			{
-				"internalType": "string[]",
-				"name": "_uriLabels",
-				"type": "string[]"
-			},
-			{
-				"internalType": "bool[]",
-				"name": "_private",
-				"type": "bool[]"
-			},
-			{
-				"internalType": "string",
-				"name": "_notesUri",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "manifestUri",
-				"type": "string"
-			}
-		],
-		"name": "uploadFiles",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "_auditContract",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

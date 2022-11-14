@@ -142,7 +142,7 @@
                                 <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
                                     <h6 class="text-muted font-semibold">Owner</h6>
                                     <h6 class="font-extrabold mb-0"><span id="ownerName"></span></h6>
-                                    <small><span id="owner"></span></small>
+                                    <small><span id="ownerAddress"></span></small>
                                 </div>
                             </div>
                         </div>
@@ -180,7 +180,7 @@
                             <div class="card-content">
                                 <!-- table hover -->
                                 <div class="table-responsive">
-                                    <table class="table table-hover mb-0" id="latest_assessments_table">
+                                    <table class="table table-hover mb-0" id="audit_files_table">
                                         <thead>
                                             <tr>
                                                 <th>File Label</th>
@@ -329,16 +329,90 @@
         const assessmentNotesDisplaySpan    = ge("assessment_notes");
         const assessmentStatusDisplaySpan   = ge("assessment_status");
         const ownerNameDisplaySpan          = ge("ownerName");
-        const ownerAddressSpan              = ge("owner");
+        const ownerAddressSpan              = ge("ownerAddress");
         const auditorNameDisplaySpan        = ge("auditorName");
         const auditorAddressDisplaySpan     = ge("auditor");
         const auditDeclaration              = ge("audit_declaration");
         const auditReport                   = ge("audit_report");
         const estimatedEndDate              = ge("estimated_end_date");
         const actualEndDate                 = ge("actual_end_date");
-        const urlParams                     = new URLSearchParams(window.location.search); 
-        var assessmentAddress               = urlParams.get("assessment");
+        const auditFilesTable               = ge("audit_files_table");
 
+        const urlParams                     = new URLSearchParams(window.location.search); 
+        
+
+        function loadPage() { 
+            var assessmentAddress           = urlParams.get("auditContract");
+            console.log(assessmentAddress);
+            var assessmentContract         = getContract(iSEAuditContractAbi, assessmentAddress);    
+            setFileData(assessmentContract); 
+            setStatus(assessmentContract);
+            assessmentContract.methods.getAuditSeed().call({ from : account })
+            .then(function(response){
+                console.log(response);
+                var auditSeed = response; 
+                ownerNameDisplaySpan.innerHTML = "";
+                ownerNameDisplaySpan.innerHTML = auditSeed.ownerName; 
+                ownerAddressSpan.innerHTML = auditSeed.owner; 
+
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
+
+        function setStatus(assessmentContract) {
+            assessmentContract.methods.getStatus().call({ from : account })
+            .then(function(response){
+                console.log(response);
+                assessmentStatusDisplaySpan.innerHTML = ""; 
+                assessmentStatusDisplaySpan.innerHTML = response; 
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
+
+        function setFileData(assessmentContract){
+            assessmentContract.methods.getUrisToAudit().call({ from : account})
+            .then(function(response){
+                console.log(response);
+                var auditUris = response[0];
+                submittedFiles.innerHTML = ""; 
+                submittedFiles.innerHTML = "<b>"+auditUris.length+"</b>";
+
+                var notesUri = response[1];
+                assessmentNotesDisplaySpan.innerHTML = ""; 
+                assessmentNotesDisplaySpan.innerHTML = "<a href=\"ipfs://"+notesUri+ "\">Assessment Notes</a>";
+
+                var tbody = auditFilesTable.getElementsByTagName("tbody")[0];
+                tbody.innerHTML = ""; 
+                for(var x = 0; x < auditUris.length; x++) {
+                    var auditUri = auditUris[x];
+                    var row = tbody.insertRow(); 
+                    var labelCell = row.insertCell(); 
+                    labelCell.append(text(auditUri[1]));
+                    var uriCell = row.insertCell();     
+                    var a = ce("a");        
+                    uriCell.append(text(auditUri[0]));            
+                    var privacyCell = row.insertCell(); 
+                    privacyCell.append(text(auditUri[2]));
+                }
+
+
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
+
+        function loadStats(){ 
+
+        }
+
+        function displayAssessment(){
+
+        }
 
     </script> 
 

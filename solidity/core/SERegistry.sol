@@ -3,12 +3,13 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "../interfaces/ISEVersionedAddress.sol";
-import "../interfaces/ISERegistryLite.sol";
+import "../interfaces/ISERegistry.sol";
 
-contract SERegistry is ISERegistryLite { 
+contract SERegistry is ISERegistry, ISEVersionedAddress { 
 
-    string constant name = "SANTA_ELENA_REGISTRY"; 
-    uint256 constant version = 1; 
+    string constant name = "RESERVED_SANTA_ELENA_REGISTRY"; 
+    uint256 constant version = 5; 
+    address self;
 
     address administrator; 
     mapping(string=>bool) isKnownName; 
@@ -22,6 +23,8 @@ contract SERegistry is ISERegistryLite {
 
     constructor(address _administrator) {
         administrator = _administrator; 
+        self = address(this);
+        init();        
     }
 
     function getName() pure external returns (string memory _name){
@@ -56,25 +59,13 @@ contract SERegistry is ISERegistryLite {
         adminOnly(); 
         require(!isKnownAddress[_address], " known address ");
         ISEVersionedAddress va_ = ISEVersionedAddress(_address);
-        VersionedEntry memory ve_ = VersionedEntry({
-                                                veAddress : _address,
-                                                name : va_.getName(),
-                                                version : va_.getVersion()
-                                            });
-        versionedEntryByAddress[_address] = ve_; 
+        return addVersionedAddressInternal(_address, va_.getName(), va_.getVersion());
+    }
 
-        if(!isKnownName[va_.getName()]) {
-            isKnownName[va_.getName()] = true; 
-        }
-        else { 
-           validAddresses = remove(addressByName[va_.getName()],validAddresses);
-        }
-        isKnownAddress[_address] = true; 
-        nameByAddress[_address] = va_.getName(); 
-        addressByName[va_.getName()] = _address; 
-        validAddresses.push(_address);
-        allAddresses.push(_address);
-        return true; 
+    function addNonVersionedAddress(address _address, string memory _name) external returns (bool _added){
+        adminOnly(); 
+        require(!isKnownAddress[_address], " known address ");
+        return addVersionedAddressInternal(_address, _name, 0);
     }
 
     function removeVersionedAddress(address _address) external returns (bool _removed){
@@ -106,6 +97,36 @@ contract SERegistry is ISERegistryLite {
         return true; 
     }
     //======================================== INTERNAL ============================================
+
+    function init() internal returns (bool _initiated){
+       return addVersionedAddressInternal(self, name, version);
+    }
+
+    function addVersionedAddressInternal(address _address, string memory _name, uint256 _version)  internal returns (bool _added) {
+        VersionedEntry memory ve_ = VersionedEntry({
+                                                veAddress : _address,
+                                                name : _name,
+                                                version : _version
+                                            });
+        return addVersionedEntryInternal(ve_);          
+    }
+
+    function addVersionedEntryInternal(VersionedEntry memory _ve) internal returns (bool _added) {
+        versionedEntryByAddress[_ve.veAddress] = _ve; 
+
+        if(!isKnownName[_ve.name]) {
+            isKnownName[_ve.name] = true; 
+        }
+        else { 
+           validAddresses = remove(addressByName[_ve.name], validAddresses);
+        }
+        isKnownAddress[_ve.veAddress] = true; 
+        nameByAddress[_ve.veAddress] = _ve.name; 
+        addressByName[_ve.name] = _ve.veAddress; 
+        validAddresses.push(_ve.veAddress);
+        allAddresses.push(_ve.veAddress);
+        return true; 
+    }
 
     function remove(address a, address [] memory b) pure internal returns (address [] memory c) {
         c = new address[](b.length-1);

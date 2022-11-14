@@ -1,7 +1,7 @@
 const connectBlockchainButton = ge("connect_web3");
 const showWallet = ge("show_wallet");
 const web3 = new Web3(window.ethereum);
-const iSERegistryAddress = "0x8425bf71B1Aa58123e187895a05c484CA918779c"; 
+const iSERegistryAddress = "0x8A8045dd634676a921AdCD32ee397d67e135B3c0"; 
 var iSERegistryContract;
 var iSEAuditManagerAddress;
 var sEAuditManagerContract; 
@@ -83,7 +83,8 @@ function loadContracts() {
 	.then(function(response){
 		console.log(response);
 		iSEAuditManagerAddress = response; 
-		sEAuditManagerContract = getContract(iSEAuditManagerAbi, iSEAuditManagerAddress);		
+		sEAuditManagerContract = getContract(iSEAuditManagerAbi, iSEAuditManagerAddress);
+		loadPage(); 		
 	})
 	.catch(function(err){
 		console.log(err);

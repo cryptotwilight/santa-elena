@@ -236,6 +236,10 @@
         const totalFiles = ge("total_files");
         const totalCo2  = ge("total_co2");
 
+        function loadPage(){ 
+            displayLatestAssessments();
+        }
+
         function loadStats() { 
 
         }
@@ -257,7 +261,7 @@
             })
             .catch(function(err){
                 console.log(err);
-            })
+            });
         }
         
         function buildRow(auditAddress) {
@@ -297,7 +301,7 @@
             })
             .catch(function(err){
                 console.log(err);
-            })
+            });
         }
 
         function setDeclaration(auditContract, declarationCell) { 
@@ -308,7 +312,7 @@
             })
             .catch(function(err){
                 console.log(err);
-            })
+            });
         }
 
         function getDeclarationText(t) {

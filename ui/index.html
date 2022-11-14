@@ -380,6 +380,12 @@
         submitNewAssessment.addEventListener("onClick", createNewAssessment);       
 
  
+        function loadPage() { 
+
+            loadStats(); 
+            displayLatestAssessments();
+        }
+
         function loadStats() {
 
         }
@@ -390,8 +396,10 @@
 
 
         function buildLatestAssessmentsTable() { 
-            latestAssessmentsTable.tbodies[0].innerHTML = ""; 
-            sEAuditManagerContract.methods.getAuditContracts().call({from : account})
+            console.log(latestAssessmentsTable);
+            console.log(latestAssessmentsTable.getElementsByTagName('tbody')[0]);
+            latestAssessmentsTable.getElementsByTagName('tbody')[0].innerHTML = ""; 
+            sEAuditManagerContract.methods.getUserAuditContracts().call({from : account})
             .then(function(response){
                 console.log(response);
                 var auditAddressList = response; 
@@ -404,6 +412,7 @@
                 console.log(err);
             })
         }
+
         function buildRow(auditAddress) {
 
             /*
@@ -424,7 +433,7 @@
             </tr>
             */
            var auditContract = getContract(iSEAuditContractAbi, auditAddress);
-           var row = latestAssessmentsTable.tbodies[0].insertRow();            
+           var row = latestAssessmentsTable.getElementsByTagName('tbody')[0].insertRow();            
            var titleCell = row.insertCell();
            titleCell.setAttribute("class","text-bold-500");
            var auditorCell = row.insertCell(); 
@@ -439,11 +448,15 @@
                 titleCell.append(ce("br"));
                 titleCell.append(text(seed.owner));
                 
-                auditorCell.append(text(seed.auditorName));
-                auditorCell.append(ce(br));
-                auditorCell.append(text(seed.auditor));
+                if(seed.auditor != "0x0000000000000000000000000000000000000000"){
+                    auditorCell.append(text(seed.auditorName));
+                    auditorCell.append(ce("br"));
+                    auditorCell.append(text(seed.auditor));
+                }
 
+                console.log(seed.uploadDate);
                 uploadDateCell.append(text(format(seed.uploadDate)));
+                
                 auditStartDateCell.append(text(format(seed.auditStartDate)));
 
            })
@@ -461,6 +474,7 @@
            i.setAttribute("class", "badge-circle badge-circle-light-secondary font-medium-1");
            i.setAttribute("data-feather", "file");
            a.append(i);
+           a.append(text("View"));
            viewCell.append(a);
         }
 
@@ -555,9 +569,9 @@
         async function createNewAssessment() {
       
             // create uri array 
-            var urisToAudit = [];
-            var onchainLabels = [];    
-            var isPrivate = [];
+            var urisToAudit     = [];
+            var onchainLabels   = [];    
+            var isPrivate       = [];
             var uploads = createUploadJson();
             console.log(uploads);
             // post files to web3.storage 
@@ -629,21 +643,25 @@
             nftRes.json()
             .then(function(response){
                 console.log(response);
-                var manifestUri = response.cid; 
-                var seed = [ownerName.value, account, auditTitle.value, Math.round(new Date().getTime()/1000), maxAuditWindow.value, 0,0,0,0,"0x0000000000000000000000000000000000000000",""];
-                console.log("seed : " + seed);
+                var manifestUri = response.value.cid; 
                 // upload 
-                postToBlockchain(seed, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri);
+                postToBlockchain(ownerName.value, auditTitle.value, maxAuditWindow, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri);
             })
             .catch(function(err){
                 console.log(err);
             });  
         }
 
-        function postToBlockchain(seed, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri) {
+        function postToBlockchain(ownerName, auditTitle, maxAuditWindow, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri) {
             console.log("sending");
             console.log(sEAuditManagerContract);
-            sEAuditManagerContract.methods.uploadFiles(seed, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri).send({from : account})
+            console.log(seed);
+            console.log(urisToAudit);
+            console.log(onchainLabels);
+            console.log(isPrivate);
+            console.log(notesUri);
+            console.log(manifestUri);
+            sEAuditManagerContract.methods.uploadFiles(ownerName, auditTitle, maxAuditWindow, carbonOffsetClaim, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri).send({from : account})
             .then(function(response){
                 console.log(response);
                 displayLatestAssessments(); 
@@ -667,6 +685,15 @@
 
         function text(txt) {
             return document.createTextNode(txt);
+        }
+
+        function format(d) {
+            if(d > 0){
+                var date = new Date(d*1000);
+                var formatted = date.getUTCFullYear() + "/" + date.getUTCMonth() + "/" + date.getUTCDate() + " " + date.getUTCHours() + " : " + date.getUTCMinutes()+ " UTC";
+                return formatted; 
+            }
+            return ""; 
         }
     </script>
 

@@ -1,4 +1,4 @@
-iAuditContractAbi = [
+iSEAuditContractAbi = [
 	{
 		"inputs": [
 			{
