@@ -1,112 +1,5 @@
 iSEAuditManagerAbi = [
 	{
-		"inputs": [],
-		"name": "notifyChangeOfAddress",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "_notified",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_auditContract",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "_status",
-				"type": "string"
-			}
-		],
-		"name": "notifyStatus",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "_recieved",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_administrator",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_registry",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_ownerName",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_auditTitle",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_maxAuditWindow",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string[]",
-				"name": "_urisToAudit",
-				"type": "string[]"
-			},
-			{
-				"internalType": "string[]",
-				"name": "_uriLabels",
-				"type": "string[]"
-			},
-			{
-				"internalType": "bool[]",
-				"name": "_private",
-				"type": "bool[]"
-			},
-			{
-				"internalType": "string",
-				"name": "_notesUri",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "manifestUri",
-				"type": "string"
-			}
-		],
-		"name": "uploadFiles",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "_auditContract",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "string",
@@ -142,19 +35,6 @@ iSEAuditManagerAbi = [
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getName",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			}
-		],
-		"stateMutability": "pure",
 		"type": "function"
 	},
 	{
@@ -203,16 +83,57 @@ iSEAuditManagerAbi = [
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "getVersion",
-		"outputs": [
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_ownerName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_auditTitle",
+				"type": "string"
+			},
 			{
 				"internalType": "uint256",
-				"name": "_version",
+				"name": "_maxAuditWindow",
 				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_urisToAudit",
+				"type": "string[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_uriLabels",
+				"type": "string[]"
+			},
+			{
+				"internalType": "bool[]",
+				"name": "_private",
+				"type": "bool[]"
+			},
+			{
+				"internalType": "string",
+				"name": "_notesUri",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_manifestUri",
+				"type": "string"
 			}
 		],
-		"stateMutability": "pure",
+		"name": "uploadFiles",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "_auditContract",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

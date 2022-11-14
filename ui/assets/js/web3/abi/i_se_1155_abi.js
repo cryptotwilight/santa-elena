@@ -2,28 +2,8 @@ iSE1155Abi = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "_administrator",
-				"type": "address"
-			},
-			{
 				"internalType": "string",
-				"name": "_defaultUri",
-				"type": "string"
-			},
-			{
-				"internalType": "bool",
-				"name": "_uriSwitchEnabled",
-				"type": "bool"
-			},
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_symbol",
+				"name": "uri_",
 				"type": "string"
 			}
 		],
@@ -197,71 +177,6 @@ iSE1155Abi = [
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "getAdministrator",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "_administrator",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getCurrentIndex",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getName",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getSymbol",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "_symbol",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getVersion",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "_version",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "pure",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -283,49 +198,6 @@ iSE1155Abi = [
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_to",
-				"type": "address"
-			}
-		],
-		"name": "mint",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "_nftId",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_to",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "_uri",
-				"type": "string"
-			}
-		],
-		"name": "mint",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "_nftId",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -415,25 +287,6 @@ iSE1155Abi = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "_minter",
-				"type": "address"
-			}
-		],
-		"name": "setAuthorisedMinter",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "_set",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "bytes4",
 				"name": "interfaceId",
 				"type": "bytes4"
@@ -454,7 +307,7 @@ iSE1155Abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_nftId",
+				"name": "",
 				"type": "uint256"
 			}
 		],

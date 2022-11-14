@@ -97,7 +97,7 @@ iSERegistryAbi = [
 						"type": "uint256"
 					}
 				],
-				"internalType": "struct ISERegistryLite.VersionedEntry[]",
+				"internalType": "struct ISERegistry.VersionedEntry[]",
 				"name": "_versionedEntries",
 				"type": "tuple[]"
 			}
