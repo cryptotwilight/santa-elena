@@ -25,3 +25,7 @@ The Smart Contracts for Santa Elena are deployed on the Goerlie Testnet and can 
 
 ## Demo UI
 The demonstration UI is deployed at the following address:
+https://fragrant-hat-0277.on.fleek.co/
+
+## Youtube Explainer 
+https://youtu.be/R2mulX_f0GA
