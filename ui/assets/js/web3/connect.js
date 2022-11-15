@@ -4,8 +4,8 @@ const web3 = new Web3(window.ethereum);
 
 // const iSERegistryAddress = "0xF5C41b43F1E7B39Ae5b5B01194f1a6E6D40955A4"; // Goerli
 
-// const iSERegistryAddress = "0x7a4F1b7A5207316Cac6C2a92d8EC59f3299f149c"; // Testnet Wallaby 
-const iSERegistryAddress = "0xE6C1A97e57E9A961d9Df513346BEEDC1707Aab09"; // Sepolia
+const iSERegistryAddress = "0x1d012AE2340C058D1473ACC911c0B3144B7F5EF2"; // Testnet Wallaby 
+
 var iSERegistryContract;
 var iSEAuditManagerAddress;
 var sEAuditManagerContract; 

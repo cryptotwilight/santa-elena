@@ -214,49 +214,32 @@
                                                                     <div class="col-12">
                                                                         <div class="form-group has-icon-left">
                                                                             <label for="first-name-icon">Owner Name</label>
-                                                                            <div class="position-relative">
-                                                                                <input type="text" id="owner_name" class="form-control" placeholder="enter name of audit owner" id="first-name-icon">
-                                                                                <div class="form-control-icon">
-                                                                                    <i class="bi bi-person"></i>
-                                                                                </div>
-                                                                                <span id="audit_owner_account_display"></span>
-                                                                            </div>
+                                                                                <i class="bi bi-person"></i><input type="text" id="owner_name" placeholder="enter name of audit owner" id="first-name-icon">                                                                                
+                                                                                <span id="audit_owner_account_display"></span>                                                                            
                                                                         </div>
                                                                     </div>
 
                                                                     <div class="col-12">
                                                                         <div class="form-group has-icon-left">
                                                                             <label for="first-name-icon">Audit Title</label>
-                                                                            <div class="position-relative">
-                                                                                <input type="text" id="audit_title" class="form-control" placeholder="enter title of audit">
-                                                                                <div class="form-control-icon">
-                                                                                    <i class="bi bi-card-text"></i>
-                                                                                </div>
-                                                                            </div>
+                                                                               <i class="bi bi-card-text"></i><input type="text" id="audit_title"  placeholder="enter title of audit">                                                                            
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-12">
                                                                         <div class="form-group has-icon-left">
                                                                             <label for="first-name-icon">Carbon Offset Claim</label>
-                                                                            <div class="position-relative">
-                                                                                <input type="text" id=carbon_offset_claim" class="form-control" placeholder="enter max audit window in days" >
-                                                                                <div class="form-control-icon">
-                                                                                    <i class="bi bi-grid-fill"></i>
-                                                                                </div>
-                                                                            </div> 
-                                                                            Kg CO<sub>2e</sub>/kWh
+                                                                            <i class="bi bi-grid-fill"></i>    <input type="text" id="carbon_offset_claim" placeholder="enter offset claim" > Kg CO<sub>2e</sub>/kWh
                                                                         </div>
                                                                     </div>   
                                                                     <div class="col-12">
                                                                         <div class="form-group has-icon-left">
-                                                                            <label for="first-name-icon">Max Audit Window</label>
-                                                                            <div class="position-relative">
-                                                                                <input type="text" id="max_audit_window" class="form-control" placeholder="enter max audit window in days" >
-                                                                                <div class="form-control-icon">
-                                                                                    <i class="bi bi-calendar"></i>
-                                                                                </div>
-                                                                            </div>
-                                                                            Days
+                                                                            <label for="first-name-icon">Max Audit Period</label>
+                                                                                                                                                         
+                                                                             
+                                                                            <i class="bi bi-calendar"></i> <input type="text" id="max_audit_period"  placeholder="enter max audit period in days" > Days
+                                                                                
+                                                                            
+                                                                           
                                                                         </div>
                                                                     </div>                                                            
                                                                 </td> 
@@ -374,9 +357,10 @@
         const carbonOffset = ge("carbon_offset");
 
         const ownerName = ge("owner_name");
+        
         const auditTitle = ge("audit_title");
-        const maxAuditWindow = ge("max_audit_window");
-        const carbonOffsetClaim = ge("carbon_offset_claim");
+        const maxAuditPeriod = ge("max_audit_period");
+        const carbonOffSetClaim = ge("carbon_offset_claim");
         
         const uploadedFiles = ge("uploaded_files");
         const auditorNotes = ge("auditor_notes");
@@ -551,6 +535,8 @@
                 var upload2 = {};
                 upload2.file = uploadFile2.files[0]; 
                 upload2.label = uploadFile2Label.value; 
+                console.log("checking");
+              
                 upload2.isPrivate = uploadFile2isPrivate.checked; 
                 uploadList.push(upload2);
             }
@@ -676,7 +662,9 @@
             manifest.title          = auditTitle.value; 
             manifest.filesUploaded  = getFilesUploaded(uploads);
             manifest.owner          = account;             
-            manifest.ownerName      = ownerName.value; 
+            manifest.ownerName      = ownerName.value;
+            manifest.carbonOffSetClaim = carbonOffSetClaim.value; 
+            manifest.maxAuditPeriod = maxAuditPeriod.value;
 
             console.log(manifest);
 
@@ -690,8 +678,9 @@
             .then(function(response){
                 console.log(response);
                 var manifestUri = response.value.cid; 
+                console.log(maxAuditPeriod);
                 // upload 
-                postToBlockchain(ownerName.value, auditTitle.value, maxAuditWindow.value * (24*60 *60), carbonOffsetClaim.value, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri);
+                postToBlockchain(manifest.ownerName,manifest.title, manifest.maxAuditPeriod * (24*60 *60), manifest.carbonOffSetClaim, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri);
             })
             .catch(function(err){
                 console.log(err);
@@ -701,7 +690,6 @@
         function postToBlockchain(ownerName, auditTitle, mxAuditWindow,carbonOffset, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri) {
             console.log("sending");
             console.log(sEAuditManagerContract);
-            console.log(seed);
             console.log(urisToAudit);
             console.log(onchainLabels);
             console.log(isPrivate);
