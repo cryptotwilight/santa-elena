@@ -1,7 +1,7 @@
 const connectBlockchainButton = ge("connect_web3");
 const showWallet = ge("show_wallet");
 const web3 = new Web3(window.ethereum);
-const iSERegistryAddress = "0x8A8045dd634676a921AdCD32ee397d67e135B3c0"; 
+const iSERegistryAddress = "0xF5C41b43F1E7B39Ae5b5B01194f1a6E6D40955A4"; 
 var iSERegistryContract;
 var iSEAuditManagerAddress;
 var sEAuditManagerContract; 
@@ -79,9 +79,10 @@ const onClickConnect = async() => {
 function loadContracts() {
 	iSERegistryContract = getContract(iSERegistryAbi, iSERegistryAddress);
 
-	iSERegistryContract.methods.getAddress("SANTA_ELENA_AUDIT_MANAGER").call({from : account})
+	iSERegistryContract.methods.getAddress("RESERVED_SANTA_ELENA_AUDIT_MANAGER").call({from : account})
 	.then(function(response){
 		console.log(response);
+		console.log("loading audit manager")
 		iSEAuditManagerAddress = response; 
 		sEAuditManagerContract = getContract(iSEAuditManagerAbi, iSEAuditManagerAddress);
 		loadPage(); 		

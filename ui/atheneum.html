@@ -49,7 +49,7 @@
             <a href="#" id="connect_web3" class="btn btn-primary rounded">Connect Web 3</a>
         </div>
         <div>
-            <span id="show_wallet"></span>
+            
         </div>
     </div>
     <div class="sidebar-menu">
@@ -94,6 +94,7 @@
             
 <div class="page-heading">
     <h3>Environmental Antheneum</h3>
+    <br/><span id="show_wallet"></span>
     <p>The Environmental Atheneum is where you will find information on all assessments that have been audited and made public by their respective owners.</p>
 </div>
 <div class="page-content">
@@ -173,12 +174,12 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Available Environmental Audits</h4>
+                            <h4>Public Environmental Assessments</h4>
                         </div>
                         <div class="card-body">
                                    <!-- table hover -->
                                    <div class="table-responsive">
-                                    <table class="table table-hover mb-0" id="available_assessments_table">
+                                    <table class="table table-hover mb-0" id="public_assessments_table">
                                         <thead>
                                             <tr>
                                                 <th>Assessment</th>
@@ -230,26 +231,28 @@
 
     <script src="assets/js/web3/connect.js"></script>
     <script> 
-        const availableAssessmentsTable = ge("available_assessments_table");
+        const publicAssessmentsTable = ge("public_assessments_table");
         const totalAudits = ge("total_audits");
         const totalOwners = ge("total_owners"); 
         const totalFiles = ge("total_files");
         const totalCo2  = ge("total_co2");
 
         function loadPage(){ 
-            displayLatestAssessments();
+            displayPublicAssessments();
         }
 
         function loadStats() { 
 
         }
 
-        function displayLatestAssessments() {
-            buildLatestAssessmentsTable(); 
+        function displayPublicAssessments() {
+            publicAssessmentsTable.getElementsByTagName("tbody")[0].innerHTML = ""; 
+            buildPublicAssessmentsTable(); 
         }
 
-        function buildAvailableAssessmentsTable() { 
-            availableAssessmentsTable.tbodies[0].innerHTML = ""; 
+
+        function buildPublicAssessmentsTable() { 
+            
             sEAuditManagerContract.methods.getPublicAuditContracts().call({from : account})
             .then(function(response){
                 console.log(response);
@@ -266,7 +269,8 @@
         
         function buildRow(auditAddress) {
             var auditContract = getContract(iSEAuditContractAbi, auditAddress);
-            var row = availableAssessmentsTable.tbodies[0].insertRow(); 
+            var tbody =  publicAssessmentsTable.getElementsByTagName("tbody")[0];
+            var row = tbody.insertRow(); 
 
             var titleCell           = row.insertCell();
             titleCell.setAttribute("class","text-bold-500");
@@ -278,26 +282,30 @@
 
             auditContract.methods.getAuditSeed().call({from : account })
             .then(function(response){
+                console.log(response);
+                var seed = response; 
                 var a = ce("a");
-                a.setAttribute("href", "assessment_review.html?assessment="+auditAddress);
+                
+                a.setAttribute("href", "assessment_review.html?auditContract="+auditAddress);
                 a.append(text(seed.auditTitle));
                 titleCell.append(a);
                 
                 ownerCell.append(text(seed.ownerName));
-                ownerCell.append(ce(br));
+                ownerCell.append(ce("br"));
                 var small = ce("small");
                 small.append(text(seed.owner)); 
                 ownerCell.append(small);
                 
                 auditorCell.append(text(seed.auditorName));
-                auditorCell.append(ce(br));
+                auditorCell.append(ce("br"));
                 var small2 = ce("small");
                 small2.append(text(seed.auditor));
                 auditorCell.append(small2);
 
-                auditDateCell.append(text(formatDate(seed.auditDate)));
+                auditDateCell.append(text(format(seed.auditDate)));
                 
-                setDeclaration(auditContract, declarationCell);
+                
+                setDeclaration(auditContract, auditDeclarationCell);
             })
             .catch(function(err){
                 console.log(err);
@@ -316,17 +324,19 @@
         }
 
         function getDeclarationText(t) {
-            if(t === 0) {
+            console.log("t = " + t);
+            if(t == 0) {
                 return "SATISFIED";
             }
-            if(t === 1) {
+            if(t == 1) {
                 return "NOT SATISFIED";
             }
             return "INDETERMINATE"; 
         }
 
         function format(d) {
-            return new Date(d).getUTCDate();
+            var x = new Date(d*1000); 
+            return x.getFullYear() + "/" + x.getUTCMonth() + " / " + x.getUTCDate() ;
         }
 
     </script>

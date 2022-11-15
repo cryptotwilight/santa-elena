@@ -48,7 +48,7 @@
             <a href="#" id="connect_web3" class="btn btn-primary rounded">Connect Web 3</a>
         </div>
         <div>
-            <span id="show_wallet"></span>
+           
         </div>
     </div>
     <div class="sidebar-menu">
@@ -92,7 +92,8 @@
             </header>
             
 <div class="page-heading">
-    <h3>Santa Elena - Environmental Assessments</h3>
+    <h3>Santa Elena - Environmental Audits</h3>
+    <br/><span id="show_wallet"></span>
 </div>
 <div class="page-content">
     <section class="row">
@@ -297,7 +298,7 @@
             })
         }
 
-        function buildAvailableAssessmentsTable() { 
+        async function buildAvailableAssessmentsTable() { 
             var tbody = assessmentsAvailableForAuditTable.getElementsByTagName("tbody")[0];
             tbody.innerHTML = "";
             sEAuditManagerContract.methods.getAuditContractsWithStatus("READY").call({from : account})
@@ -305,9 +306,8 @@
                 console.log(response);
                 var auditAddressList = response; 
                 for(var x = 0; x < response.length; x++){
-                    var auditAddress = auditAddressList[x];
-                    var row = tbody.insertRow(); 
-                    buildAARow(auditAddress, row);
+                    var auditContractAddress = auditAddressList[x];
+                    buildOnStatus(tbody, auditContractAddress);            
                 }
             })
             .catch(function(err){
@@ -315,7 +315,24 @@
             })
         }
 
-        function buildOARow(auditAddress, row) {
+        function buildOnStatus(tbody, auditContractAddress) {
+            auditContract = getContract(iSEAuditContractAbi, auditContractAddress);
+            auditContract.methods.getStatus().call({from : account})
+            .then(function(response){
+                console.log(response);
+                var status = response; 
+                if(status === "AWAITING_AUDIT"){
+                    var row = tbody.insertRow(); 
+                    buildAARow(auditAddress, row, status);
+                }
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+           
+        }
+
+        function buildOARow(auditAddress, row, status) {
             var auditContract = getContract(iSEAuditContractAbi, auditAddress);            
 
             var titleCell             = row.insertCell();
@@ -342,7 +359,7 @@
 
                 setEstimatedAuditEndDate(auditContract, auditEndDateCell);
                 
-                setStatus(auditContract, statusCell);
+                statusCell.append(text(status));                
             
             })
             .catch(function(err){
@@ -380,18 +397,6 @@
             })
         }
 
-        function setStatus(auditContract, statusCell) {
-            auditContract.methods.getStatus().call({from : account})
-           .then(function(response){
-                console.log(response);
-                statusCell.append(text(response));
-           })
-           .catch(function(err){
-                console.log(err);
-           });
-        }        
-
-
         function buildAARow(auditAddress, row) {
             var auditContract = getContract(iSEAuditContractAbi, auditAddress);            
 
@@ -419,7 +424,7 @@
 
                 setFileCount(auditContract, fileCountCell);
 
-                maxAuditPeriodCell.append(text(seed.maxAuditWindow + " days "));
+                maxAuditPeriodCell.append(text(seed.maxAuditWindow/(60*60*24) + " days "));
                 
                 setStatus(auditContract, statusCell);
                 populateBookingCell(bookingCell, auditAddress);

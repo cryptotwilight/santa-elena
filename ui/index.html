@@ -46,7 +46,7 @@
                         <a href="#" id="connect_web3" class="btn btn-primary rounded">Connect Web 3</a>
                     </div>
                     <div>
-                        <span id="show_wallet"></span>
+                      
                     </div>
                 </div>
                 <div class="sidebar-menu">
@@ -90,6 +90,7 @@
 
             <div class="page-heading">
                 <h3>Environmental Assessments</h3>
+                <br/>  <span id="show_wallet"></span>
             </div>
             <div class="page-content">
                 <section class="row">
@@ -197,7 +198,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12 col-xl-8">
+                            <div class="col-12 col-xl-12">
                                 <div class="card">
                                     <div class="card-header">
                                         <h4 class="card-title">Create New Assessment</h4>
@@ -207,102 +208,115 @@
                                             <form class="form form-vertical">
                                                 <div class="form-body">
                                                     <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="form-group has-icon-left">
-                                                                <label for="first-name-icon">Owner Name</label>
-                                                                <div class="position-relative">
-                                                                    <input type="text" id="owner_name" class="form-control" placeholder="enter name of audit owner" id="first-name-icon">
-                                                                    <div class="form-control-icon">
-                                                                        <i class="bi bi-person"></i>
+                                                        <table> 
+                                                            <tr>
+                                                                <td valign="top">   
+                                                                    <div class="col-12">
+                                                                        <div class="form-group has-icon-left">
+                                                                            <label for="first-name-icon">Owner Name</label>
+                                                                            <div class="position-relative">
+                                                                                <input type="text" id="owner_name" class="form-control" placeholder="enter name of audit owner" id="first-name-icon">
+                                                                                <div class="form-control-icon">
+                                                                                    <i class="bi bi-person"></i>
+                                                                                </div>
+                                                                                <span id="audit_owner_account_display"></span>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                    <span id="audit_owner_account_display"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <div class="form-group has-icon-left">
-                                                                <label for="first-name-icon">Audit Title</label>
-                                                                <div class="position-relative">
-                                                                    <input type="text" id="audit_title" class="form-control" placeholder="enter title of audit">
-                                                                    <div class="form-control-icon">
-                                                                        <i class="bi bi-card-text"></i>
+                                                                    <div class="col-12">
+                                                                        <div class="form-group has-icon-left">
+                                                                            <label for="first-name-icon">Audit Title</label>
+                                                                            <div class="position-relative">
+                                                                                <input type="text" id="audit_title" class="form-control" placeholder="enter title of audit">
+                                                                                <div class="form-control-icon">
+                                                                                    <i class="bi bi-card-text"></i>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <div class="form-group has-icon-left">
+                                                                            <label for="first-name-icon">Max Audit Window</label>
+                                                                            <div class="position-relative">
+                                                                                <input type="text" id="max_audit_window" class="form-control" placeholder="enter max audit window in days" >
+                                                                                <div class="form-control-icon">
+                                                                                    <i class="bi bi-calendar"></i>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>                                                            
+                                                                </td> 
+                                                                <td valign="top">  
+                                                                    <div class="col-12">
+                                                                        <div class="card">
+                                                                            <div class="card-header">
+                                                                                <h5 class="card-title">Upload Assessment Notes</h5>
+                                                                            </div>
+                                                                            <div class="card-content">
+                                                                                <div class="card-body">
+                                                                                    <p class="card-text">These are notes to the auditor
+                                                                                    </p>
+                                                                                    <!-- Basic file uploader -->
+                                                                                    <input type="file" id="auditor_notes" class="basic-filepond">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            <td> 
+                                                                <div class="col-12">
+                                                                    <div class="card">
+                                                                        <div class="card-header">
+                                                                            <h5 class="card-title">Upload Files to be Assessed</h5>
+                                                                        </div>
+                                                                        <div class="card-content">
+                                                                            <div class="card-body">
+                                                                                <p class="card-text"Files to be uploaded
+                                                                                </p>
+                                                                                <!-- File uploader with multiple files upload -->
+                                                                                <table> 
+                                                                                    <tr> 
+                                                                                        <td><input type="file" id="upload_file_1" class="basic-filepond"></td>
+                                                                                        <td><input type="checkbox" id="upload_file_1_privacy">&nbsp; private?</td>
+                                                                                        <td><input type="text" id="upload_file_1_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
+                                                                                    </tr>
+                                                                                    <tr> 
+                                                                                        <td><input type="file" id="upload_file_2" class="basic-filepond"></td>
+                                                                                        <td><input type="checkbox" id="upload_file_2_privacy">&nbsp; private?</td>
+                                                                                        <td><input type="text" id="upload_file_2_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
+                                                                                    </tr>
+                                                                                    <tr> 
+                                                                                        <td><input type="file" id="upload_file_3" class="basic-filepond"></td>
+                                                                                        <td><input type="checkbox" id="upload_file_3_privacy">&nbsp; private?</td>
+                                                                                        <td><input type="text" id="upload_file_3_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
+                                                                                    </tr>
+                                                                                    <tr> 
+                                                                                        <td><input type="file" id="upload_file_4" class="basic-filepond"></td>
+                                                                                        <td><input type="checkbox" id="upload_file_4_privacy">&nbsp; private?</td>
+                                                                                        <td><input type="text" id="upload_file_4_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
+                                                                                    </tr>
+                                                                                    <tr> 
+                                                                                        <td><input type="file" id="upload_file_5" class="basic-filepond"></td>
+                                                                                        <td><input type="checkbox" id="upload_file_5_privacy">&nbsp; private?</td>
+                                                                                        <td><input type="text" id="upload_file_5_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
+                                                                                    </tr>
+        
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <div class="form-group has-icon-left">
-                                                                <label for="first-name-icon">Max Audit Window</label>
-                                                                <div class="position-relative">
-                                                                    <input type="text" id="max_audit_window" class="form-control" placeholder="enter max audit window in days" >
-                                                                    <div class="form-control-icon">
-                                                                        <i class="bi bi-calendar"></i>
-                                                                    </div>
+                                                            </td> 
+                                                        </tr>                                                                
+                                                        <tr>                                                    
+                                                            <td colspan="3">
+                                                                <div class="col-12 d-flex justify-content-end">
+                                                                    <a href="javascript:createNewAssessment()" id="submit_new_assessment" class="btn btn-primary me-1 mb-1">Create</a>                                                            
+                                                                    <button type="reset" id="clear_assessment_form" class="btn btn-light-secondary me-1 mb-1">Reset</button>
                                                                 </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-12">
-                                                            <div class="card">
-                                                                <div class="card-header">
-                                                                    <h5 class="card-title">Upload Assessment Notes</h5>
-                                                                </div>
-                                                                <div class="card-content">
-                                                                    <div class="card-body">
-                                                                        <p class="card-text">These are notes to the auditor
-                                                                        </p>
-                                                                        <!-- Basic file uploader -->
-                                                                        <input type="file" id="auditor_notes" class="basic-filepond">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <div class="card">
-                                                                <div class="card-header">
-                                                                    <h5 class="card-title">Upload Files to be Assessed</h5>
-                                                                </div>
-                                                                <div class="card-content">
-                                                                    <div class="card-body">
-                                                                        <p class="card-text"Files to be uploaded
-                                                                        </p>
-                                                                        <!-- File uploader with multiple files upload -->
-                                                                        <table> 
-                                                                            <tr> 
-                                                                                <td><input type="file" id="upload_file_1" class="basic-filepond"></td>
-                                                                                <td><input type="checkbox" id="upload_file_1_privacy">&nbsp; private?</td>
-                                                                                <td><input type="text" id="upload_file_1_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
-                                                                            </tr>
-                                                                            <tr> 
-                                                                                <td><input type="file" id="upload_file_2" class="basic-filepond"></td>
-                                                                                <td><input type="checkbox" id="upload_file_2_privacy">&nbsp; private?</td>
-                                                                                <td><input type="text" id="upload_file_2_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
-                                                                            </tr>
-                                                                            <tr> 
-                                                                                <td><input type="file" id="upload_file_3" class="basic-filepond"></td>
-                                                                                <td><input type="checkbox" id="upload_file_3_privacy">&nbsp; private?</td>
-                                                                                <td><input type="text" id="upload_file_3_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
-                                                                            </tr>
-                                                                            <tr> 
-                                                                                <td><input type="file" id="upload_file_4" class="basic-filepond"></td>
-                                                                                <td><input type="checkbox" id="upload_file_4_privacy">&nbsp; private?</td>
-                                                                                <td><input type="text" id="upload_file_4_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
-                                                                            </tr>
-                                                                            <tr> 
-                                                                                <td><input type="file" id="upload_file_5" class="basic-filepond"></td>
-                                                                                <td><input type="checkbox" id="upload_file_5_privacy">&nbsp; private?</td>
-                                                                                <td><input type="text" id="upload_file_5_onchain_label" class="form-control" placeholder="enter file label" ></td>                                                                                
-                                                                            </tr>
-
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12 d-flex justify-content-end">
-                                                            <a href="javascript:createNewAssessment()" id="submit_new_assessment" class="btn btn-primary me-1 mb-1">Submit</a>                                                            
-                                                            <button type="reset" id="clear_assessment_form" class="btn btn-light-secondary me-1 mb-1">Reset</button>
-                                                        </div>
+                                                            </td> 
+                                                        </tr>                                                                
+                                                     </table>                                                        
                                                     </div>
                                                 </div>
                                             </form>
@@ -446,18 +460,19 @@
                 var seed = response; 
                 titleCell.append(text(seed.auditTitle));
                 titleCell.append(ce("br"));
-                titleCell.append(text(seed.owner));
+                titleCell.append(shortenAddressAndLink(seed.owner));
                 
                 if(seed.auditor != "0x0000000000000000000000000000000000000000"){
                     auditorCell.append(text(seed.auditorName));
                     auditorCell.append(ce("br"));
-                    auditorCell.append(text(seed.auditor));
+                    auditorCell.append(shortenAddressAndLink(seed.auditor));
                 }
 
                 console.log(seed.uploadDate);
                 uploadDateCell.append(text(format(seed.uploadDate)));
                 
-                auditStartDateCell.append(text(format(seed.auditStartDate)));
+                auditStartDateCell.append(text(format(seed.auditStart)));
+                auditEndDateCell.append(text(format(seed.auditDate)))
 
            })
            .catch(function(err){
@@ -476,6 +491,18 @@
            a.append(i);
            a.append(text("View"));
            viewCell.append(a);
+        }
+        const size = 4;
+        const blockchain = "https://goerli.etherscan.io/address/";
+        function shortenAddressAndLink(address) {
+            var first = address.slice(0, size + 1);
+            var last = address.slice(-size);
+            var a = ce("a");
+            a.setAttribute("href",blockchain + address);
+            var result = first + "..." + last;
+            a.append(text(result));
+            a.setAttribute("target", "_blank");
+            return a;
         }
 
         function setStatus(auditContract, statusCell) {
