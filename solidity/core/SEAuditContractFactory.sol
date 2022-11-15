@@ -23,8 +23,7 @@ contract SEAuditContractFactory is ISEAuditContractFactory, ISEVersionedAddress 
     mapping(address=>bool) knownAuditContract; 
 
     string constant name                            = "RESERVED_SANTA_ELENA_AUDIT_CONTRACT_FACTORY"; 
-    uint256 constant version = 14;
-
+    uint256 constant version = 23;
     constructor(address _administrator, address _registry){
         administrator = _administrator; 
         registry = ISERegistry(_registry);

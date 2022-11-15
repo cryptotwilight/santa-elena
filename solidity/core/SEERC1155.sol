@@ -4,15 +4,16 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "./ERC1155.sol";
 
-import "../interfaces/ISEVersionedAddress.sol";
+import "../interfaces/ISEMintable.sol";
 import "../interfaces/ISERegistry.sol";
+import "../interfaces/ISEMintAuthRegistry.sol";
 
-contract SEERC1155 is ERC1155, ISEVersionedAddress { 
-    uint256 constant version  = 3;
+contract SEERC1155 is ERC1155, ISEMintable { 
+    uint256 constant version  = 5;
     string name; 
 
     string constant SANTA_ELENA_REGISTRY_CA = "RESERVED_SANTA_ELENA_REGISTRY";
-    string constant SANTA_ELENA_AUTHORISED_MINTER_CA = "RESERVED_SANTA_ELENA_MINTER";
+    string constant SANTA_ELENA_MINT_AUTHORISATION_REGISTRY_CA = "RESERVED_SANTA_ELENA_MINT_AUTHORISATION_REGISTRY";
 
     string symbol; 
     
@@ -23,11 +24,13 @@ contract SEERC1155 is ERC1155, ISEVersionedAddress {
     mapping(uint256=>string) uriByNftId; 
     address authorisedMinter; 
 
-    constructor(address _administrator, address _registry, 
+    constructor(address _administrator, 
+                address _registry, 
                 string memory _defaultUri, 
-                string memory _name, string memory _symbol) ERC1155(_defaultUri) {
+                string memory _name, 
+                string memory _symbol) ERC1155(_defaultUri) {
         
-        registry = ISERegistry(_registry);
+        registry = ISERegistry(_registry);        
         administrator = _administrator; 
         name = _name; 
         symbol = _symbol; 
@@ -78,16 +81,11 @@ contract SEERC1155 is ERC1155, ISEVersionedAddress {
     }
 
     function authorisedMinterOnly() view internal returns (bool _admin) {
-        require(msg.sender == registry.getAddress(SANTA_ELENA_AUTHORISED_MINTER_CA), " authorised minter only ");
+        require(ISEMintAuthRegistry(registry.getAddress(SANTA_ELENA_MINT_AUTHORISATION_REGISTRY_CA)).isKnown(msg.sender), " authorised minter only ");
         return true; 
     }
 
-    uint256 index = 0; 
 
-    function getIndex() internal returns (uint256 _index){
-        _index = index; 
-        index++; 
-        return _index; 
-    }
+
 
 }

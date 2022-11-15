@@ -33,4 +33,7 @@ interface ISEMinter {
      * @return _nftId the id of the NFT holding the minted audit submission proof
      */
     function mintAuditSubmissionProof(address _auditor, string memory _auditSubmissionManifestUri) external returns (address _erc1155, uint256 _nftId);
+
+
+    function mintSealAndProof(address _auditor, string memory _auditSubmissionManifestUri, string memory _auditorSeal, address _auditContract) external returns (address _erc1155Seal, uint256 _nftIdSeal, address _erc1155Submission, uint256 _nftIdSubmission );
 }

@@ -5,7 +5,7 @@ pragma solidity >=0.7.0 <0.9.0;
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/b2970b96e5e2be297421cd7690e3502e49f7deff/contracts/token/ERC1155/IERC1155Receiver.sol"; 
 
 
-import "../interfaces/ISEMinter.sol";
+import "../interfaces/ISEMintable.sol";
 import "../interfaces/ISERegistry.sol";
 import "../interfaces/ISEVersionedAddress.sol";
 import "../interfaces/ISEAuditContract.sol";
@@ -15,12 +15,7 @@ import "../interfaces/ISEAuditManagerNotification.sol";
 contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Receiver { 
     
     address self; 
-    struct Proof {
-        PROOF proof; 
-        address erc1155;
-        uint256 nftId;
-    }
-
+   
     mapping(PROOF=>Proof) proofByPROOF; 
     mapping(bool=>string[]) auditUriByPrivacy; 
     mapping(string=>AuditUri) auditUriByUri; 
@@ -31,12 +26,16 @@ contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Recei
     string auditReport; 
     string [] uris; 
     string notesUri;
+    Seal seal; 
+
 
     string constant name = "SANTA ELENA AUDIT CONTRACT";
-    uint256 constant version = 10; 
+    uint256 constant version = 25; 
 
-    string constant SANTA_ELENA_NOTIFICATION_CA = "RESERVED_SANTA_ELENA_AUDIT_MANAGER"; 
-    string constant SANTA_ELENA_MINTER_CA = "RESERVED_SANTA_ELENA_MINTER";
+    string constant SANTA_ELENA_NOTIFICATION_CA             = "RESERVED_SANTA_ELENA_AUDIT_MANAGER"; 
+    string constant SANTA_ELENA_MINTER_CA                   = "RESERVED_SANTA_ELENA_MINTER";
+    string constant AUDIT_SUBMISSION_PROOF_MINTER_CA        = "RESERVED_AUDIT_SUBMISSION_PROOF_MINT_CONTRACT";
+    string constant DECLARATION_MINTER_CA                   = "RESERVED_DECLARATION_SEAL_MINT_CONTRACT";
 
     AuditSeed seed; 
     ISERegistry registry; 
@@ -113,34 +112,49 @@ contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Recei
         return (auditReport, declaration); 
     }
 
+    function getSeal() view external returns (Seal memory _seal) {
+        return seal; 
+    }
 
     function getProofs(PROOF _proof) view external returns (address _erc1155, uint256 _nftId){
         Proof memory proof_ = proofByPROOF[_proof];
         return (proof_.erc1155, proof_.nftId);
     }
 
-    function submitAuditReport( string memory _auditReportUri, 
-                                AUDIT_DECLARATION _declaration, 
-                                string memory _auditorSealUri, string memory _auditSubmissionManifestUri) external returns (bool _submitted){
+    function declareAndSealReport(AUDIT_DECLARATION _declaration, string memory _auditorSealManifestUri) external returns (bool _sealed) {
         require(msg.sender == seed.auditor, " auditor only ");
-        auditReport = _auditReportUri;
-        declaration = _declaration;
-        seed.auditDate = block.timestamp; 
-        updateSeed(seed.ownerName, seed.owner, seed.auditTitle, seed.uploadDate, 
-                    seed.maxAuditWindow, seed.auditStart, block.timestamp, 0, seed.expires, seed.auditor, seed.auditorName );
-        state = AUDIT_STATE.AUDIT_COMPLETE;
-        // mint 
-        ISEMinter minter_ = ISEMinter(registry.getAddress(SANTA_ELENA_MINTER_CA)); 
-        minter_.mintDeclaration(_auditorSealUri, self);
-        (address erc1155_, uint256 nftId_) = minter_.mintAuditSubmissionProof(msg.sender, _auditSubmissionManifestUri);
-
-        Proof memory proof_ = Proof ({
-                                    proof : PROOF.AUDIT,
-                                    erc1155 : erc1155_,
-                                    nftId : nftId_
-                                });
-        proofByPROOF[PROOF.AUDIT] = proof_;
+        declaration = _declaration;        
+        state = AUDIT_STATE.AUDIT_SEALED;
+        ISEMintable mintable_ = ISEMintable(registry.getAddress(DECLARATION_MINTER_CA)); 
+        uint256 nftIdSeal_ = mintable_.mint(self, _auditorSealManifestUri);
+        seal = Seal({
+                        erc1155 : address(mintable_),
+                        nftId : nftIdSeal_
+                    });
         ISEAuditManagerNotification(registry.getAddress(SANTA_ELENA_NOTIFICATION_CA)).notifyStatus(self, getStatusInternal());
+        return true; 
+    }
+
+    function submitAuditReport( string memory _auditReportUri, string memory _auditSubmissionManifestUri) external returns (bool _submitted){
+        require(msg.sender == seed.auditor, " auditor only ");
+         // mint         
+        ISEMintable mintable_       = ISEMintable(registry.getAddress(AUDIT_SUBMISSION_PROOF_MINTER_CA));                                
+        uint256 nftIdSubmission_    = mintable_.mint(msg.sender, _auditSubmissionManifestUri);    
+        Proof memory proof_         = Proof ({
+                                            proof : PROOF.AUDIT,
+                                            erc1155 : address(mintable_),
+                                            nftId : nftIdSubmission_
+                                        });
+        proofByPROOF[PROOF.AUDIT]   = proof_;
+        auditReport = _auditReportUri;        
+        
+        updateSeed(seed.ownerName, seed.owner, seed.auditTitle, seed.uploadDate, 
+                    seed.maxAuditWindow, seed.auditStart, block.timestamp, 0, 
+                    seed.expires, seed.auditor, seed.auditorName, seed.carbonOffSet); 
+
+        state = AUDIT_STATE.AUDIT_COMPLETE;
+        ISEAuditManagerNotification(registry.getAddress(SANTA_ELENA_NOTIFICATION_CA)).notifyStatus(self, getStatusInternal());
+
         return true; 
     }
 
@@ -149,7 +163,7 @@ contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Recei
         require(msg.sender == seed.owner || msg.sender == seed.auditor, " auditor / owner only ");
         return (getAuditUris(uris), notesUri);
     }
-
+ 
 
     function getPublicData() view external returns (AuditUri [] memory _publicAuditUris){
         require(state == AUDIT_STATE.PUBLIC," audit not public " );
@@ -158,7 +172,7 @@ contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Recei
 
     function makePublic() external returns (bool _done) {
         require(msg.sender == seed.owner, " owner only ");
-        require(state == AUDIT_STATE.AUDIT_COMPLETE, " no complete audit ");
+        require(state == AUDIT_STATE.AUDIT_SEALED, " non-sealed audit ");
         state = AUDIT_STATE.PUBLIC;
         ISEAuditManagerNotification(registry.getAddress(SANTA_ELENA_NOTIFICATION_CA)).notifyStatus(self, getStatusInternal());
         return true; 
@@ -170,7 +184,7 @@ contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Recei
         state = AUDIT_STATE.BOOKED_FOR_AUDIT;
         uint256 expiry_ = block.timestamp + seed.maxAuditWindow;
         updateSeed(seed.ownerName, seed.owner, seed.auditTitle, seed.uploadDate, 
-                    seed.maxAuditWindow, block.timestamp, 0, 0, expiry_, msg.sender, _auditorName );
+                    seed.maxAuditWindow, block.timestamp, 0, 0, expiry_, msg.sender, _auditorName, seed.carbonOffSet );
 
         
         string memory status_ = getStatusInternal(); 
@@ -178,6 +192,14 @@ contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Recei
         return true; 
     }
   
+    function withdraw() external returns (bool _withdrawn) {
+        require(msg.sender == seed.owner, " owner only ");
+        state = AUDIT_STATE.WITHDRAWN; 
+        string memory status_ = getStatusInternal(); 
+        ISEAuditManagerNotification(registry.getAddress(SANTA_ELENA_NOTIFICATION_CA)).notifyStatus(self,status_ );
+        return true; 
+    }
+
     function getEstimatedAuditEndTime() view external returns (uint256 _auditEndTime){
        return getAuditEndTimeInternal();
     }
@@ -190,7 +212,7 @@ contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Recei
 
     function updateSeed(string memory _ownerName, address _owner,  string memory _auditTitle, uint256 _uploadDate,        
                         uint256 _maxAuditWindow,  uint256 _auditStart,  uint256 _auditDate, 
-                        uint256 _publishDate, uint256 _expires, address _auditor,  string memory _auditorName ) internal returns (bool updated ){
+                        uint256 _publishDate, uint256 _expires, address _auditor,  string memory _auditorName, uint256 _carbonOffSet ) internal returns (bool updated ){
         seed = AuditSeed({
                         ownerName      :  _ownerName,      
                         owner          :  _owner,       
@@ -202,7 +224,8 @@ contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Recei
                         publishDate    :  _publishDate,
                         expires        :  _expires,        
                         auditor        :  _auditor, 
-                        auditorName    :  _auditorName
+                        auditorName    :  _auditorName,
+                        carbonOffSet   :  _carbonOffSet
         });
         return true; 
     }  
@@ -221,6 +244,10 @@ contract SEAuditContract is ISEAuditContract, ISEVersionedAddress, IERC1155Recei
 
         if(state == AUDIT_STATE.READY){
             return "AWAITING_AUDIT";
+        }
+
+        if(state == AUDIT_STATE.AUDIT_SEALED){
+            return "SEALED";
         }
 
         if(state == AUDIT_STATE.PUBLIC){

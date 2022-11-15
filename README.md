@@ -2,9 +2,11 @@
 This is the Santa Elena repository. The Santa Elena project is about creating a platform that will allow independent groups to collate their climate data on the decentralized Web. 
 Santa Elena works by using both NFT.storage and Web3.storage to store environmental data that is submitted as part of an environmental assessment. On upload the uploader is issued 
 with an NFT proof of their upload. 
+
 The auditor books a given assessment for audit and is then given access to all the files made available for audit. 
 Once the audit is complete the auditor delivers their assessment and provides a declarative seal on the assessment 
 At this point the uploader can choose whether to make the assessment public or not. 
+
 If they choose to make the assessment public the assessment is made available in the atheneum for interested parties to view. The assessment will only show data originally declared as not private by the uploader 
 
 NFT.storage is used to mint the NFTs that are used for proof
@@ -14,14 +16,14 @@ Web3.storage is used to store the uploaded files for the assessment.
 ### Testnet Wallaby - Filecoin EVM 
 |Contract 									     |Address 		  		                   |Version|
 |------------------------------------------------|-------------------------------------------|-----|
-|Santa Elena Registry 							 |0x7a4F1b7A5207316Cac6C2a92d8EC59f3299f149c |5    |
-|Santa Elena Audit Manager 						 |0xE6aab3530315a21059394B34f3B99295Ea379203 |14   |
+|Santa Elena Registry 							 |0x1d012AE2340C058D1473ACC911c0B3144B7F5EF2 |5    |
+|Santa Elena Audit Manager 						 |0x771878eFd3758AE957CE77d2f234cdeB77aCA57E |18   |
 |												 | 									         |     |
-|Santa Elena Contract Factory 					 |0xE0Dd5774688e09453480a4258498b29a3A824f2a |15   |
-|Santa Elena Minter 							 |0x730D6819C89c28749398bf65CB012150be9CeEea |8    |
-|Santa Elena Audit Declaration NFT Contract 	 |0x8c8cbf24D3c117b0ee4B2d7A59EDFE3cDB275c2E |3    |
-|Santa Elena Upload Proof Contract 				 |0x5BF6b0cacEe073b5c28635D0BeE0A407F3b130DD |3    |
-|Santa Elena Audit Submission Proof Contract 	 |0x5509b216591AA36793302e19D0bba63D6FAC1EE9 |3    |
+|Santa Elena Contract Factory 					 |0xAceE151287b6aE65013D99f737a7601E3c6Abc9f |23   |
+|Santa Elena Mint Authorisation Registry		 |0x025E9cddcFDbD2290a9eE877a08584EbD36A0765 |1    |
+|Santa Elena Declaration and Sealing Contract 	 |0x65d2277fa7f6F34168411Be1E236033f43f6ac53 |3    |
+|Santa Elena Upload Proof Contract 				 |0x3c045b14B898a50489bDB87baDaf6d0f4a75AE7a |5    |
+|Santa Elena Audit Submission Proof Contract 	 |0x1504010aB3E49a2547Afd777Eb4efc33DcC008BD |5    |
 
 
 ### Goerlie Testnet 

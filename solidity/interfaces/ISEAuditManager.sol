@@ -14,12 +14,14 @@ interface ISEAuditManager {
      * @param _ownerName this is the name of the owner of the audit
      * @param _auditTitle this is the title of the audit
      * @param _maxAuditWindow this is the maximum time allowed for the audit to complete
+     * @param _carbonOffset the amount of carbon claimed to be offset by the owner
      * @param _urisToAudit list of uris to be audited
      * @param _private true if the uri contains private data
-     * @param _notesUri explanatory notes on the uploaded data
+     * @param _notesUri notes for this upload
+     * @param _uploadManifestUri manifest of all files that have been uploaded including notes
      * @return _auditContract address of the audit contract 
      */
-    function uploadFiles(string memory _ownerName, string memory _auditTitle, uint256 _maxAuditWindow, string [] memory _urisToAudit, string [] memory _uriLabels, bool [] memory _private, string memory _notesUri, string memory _manifestUri) external returns (address _auditContract);
+    function uploadFiles(string memory _ownerName, string memory _auditTitle, uint256 _maxAuditWindow, uint256 _carbonOffset, string [] memory _urisToAudit, string [] memory _uriLabels, bool [] memory _private, string memory _notesUri, string memory _uploadManifestUri) external returns (address _auditContract);
 
     /**
      * @dev this retrieves all the public audit contract managed by this manager 

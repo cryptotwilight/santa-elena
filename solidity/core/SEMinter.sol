@@ -13,7 +13,7 @@ contract SEMinter is ISEMinter, ISEVersionedAddress {
     address administrator; 
 
     string constant name                                    = "RESERVED_SANTA_ELENA_MINTER";
-    uint256 constant version                                = 8; 
+    uint256 constant version                                = 11; 
 
     string constant SANTA_ELENA_REGISTRY_CA                 = "RESERVED_SANTA_ELENA_REGISTRY";
     string constant SANTA_ELENA_AUDIT_CONTRACT_REGISTRY_CA  = "RESERVED_SANTA_ELENA_AUDIT_CONTRACT_FACTORY"; // audit contract registry implementation
@@ -74,7 +74,7 @@ contract SEMinter is ISEMinter, ISEVersionedAddress {
         require(authorisedMinters[msg.sender] || auditContractRegistry.isKnown(msg.sender), " registered only ");
         _erc1155 = mintContractByName[DECLARATION_MINTER_CA];        
         SEERC1155 seerc1155_ = SEERC1155(_erc1155);
-        _nftId = seerc1155_.mint(_auditContract, _auditorSealManifestUri);
+     //   _nftId = seerc1155_.mint(_auditContract, _auditorSealManifestUri);
         return(_erc1155, _nftId);
     }
 
@@ -90,9 +90,23 @@ contract SEMinter is ISEMinter, ISEVersionedAddress {
         require(authorisedMinters[msg.sender] || auditContractRegistry.isKnown(msg.sender), " registered only ");
         _erc1155 = mintContractByName[AUDIT_SUBMISSION_PROOF_MINTER_CA]; 
         SEERC1155 seerc1155_ = SEERC1155(_erc1155);
-        _nftId = seerc1155_.mint(_auditor, _auditSubmissionManifestUri); 
+       // _nftId = seerc1155_.mint(_auditor, _auditSubmissionManifestUri); 
         return(_erc1155, _nftId);
     }
+
+
+    function mintSealAndProof(address _auditor, string memory _auditSubmissionManifestUri, string memory _auditorSealManifestUri, address _auditContract) external returns (address _erc1155Seal, uint256 _nftIdSeal, address _erc1155Submission, uint256 _nftIdSubmission ){
+        require(authorisedMinters[msg.sender] || auditContractRegistry.isKnown(msg.sender), " registered only ");
+        _erc1155Submission = mintContractByName[AUDIT_SUBMISSION_PROOF_MINTER_CA]; 
+        SEERC1155 seerc1155Submission_ = SEERC1155(_erc1155Submission);
+        _nftIdSubmission = seerc1155Submission_.mint(_auditor, _auditSubmissionManifestUri); 
+
+        _erc1155Seal = mintContractByName[DECLARATION_MINTER_CA];        
+        SEERC1155 seerc1155Seal_ = SEERC1155(_erc1155Seal);
+        _nftIdSeal = seerc1155Seal_.mint(_auditContract, _auditorSealManifestUri);
+        return ( _erc1155Seal, _nftIdSeal, _erc1155Submission, _nftIdSubmission );
+    }
+
 
     function addAuthorisedMinter(address _minter) external returns (bool _removed){
         adminOnly();

@@ -282,9 +282,26 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
 
         _afterTokenTransfer(operator, address(0), to, ids, amounts, data);
 
-        _doSafeTransferAcceptanceCheck(operator, address(0), to, id, amount, data);
+        //_doSafeTransferAcceptanceCheck(operator, address(0), to, id, amount, data);
     }
 
+    function mint(
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) external returns (uint256 _id) {
+        _id = getIndex(); 
+        _mint(to, getIndex(), amount, data);
+    }
+
+    uint256 index = 0; 
+
+    function getIndex() internal returns (uint256 _index){
+        _index = index; 
+        index++; 
+        return _index; 
+    }
     /**
      * @dev xref:ROOT:erc1155.adoc#batch-operations[Batched] version of {_mint}.
      *

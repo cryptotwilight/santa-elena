@@ -6,21 +6,22 @@ pragma experimental ABIEncoderV2;
 import "../interfaces/ISEAuditManager.sol";
 import "../interfaces/ISEAuditManagerNotification.sol";
 import "../interfaces/ISEAuditContractFactory.sol";
-import "../interfaces/ISEMinter.sol";
+import "../interfaces/ISEMintable.sol";
 import "../interfaces/ISERegistry.sol";
 import "../interfaces/ISEVersionedAddress.sol";
 
 contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVersionedAddress { 
 
     string constant name = "RESERVED_SANTA_ELENA_AUDIT_MANAGER";
-    uint256 constant version = 14; 
+    uint256 constant version = 18; 
 
     string constant SANTA_ELENA_REGISTRY_CA                 = "RESERVED_SANTA_ELENA_REGISTRY";
     string constant SANTA_ELENA_AUDIT_CONTRACT_FACTORY_CA   = "RESERVED_SANTA_ELENA_AUDIT_CONTRACT_FACTORY";
-    string constant SANTA_ELENA_NFT_MINTER_CA               = "RESERVED_SANTA_ELENA_MINTER";
+    string constant UPLOAD_MINTER_CA                        = "RESERVED_UPLOAD_PROOF_MINT_CONTRACT";
+
     ISERegistry registry; 
     ISEAuditContractFactory factory; 
-    ISEMinter minter;
+    
     
     address self; 
     address administrator; 
@@ -32,8 +33,7 @@ contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVers
     constructor(address _administrator, address _registry) {
         administrator = _administrator; 
         registry = ISERegistry(_registry); 
-        factory = ISEAuditContractFactory(registry.getAddress(SANTA_ELENA_AUDIT_CONTRACT_FACTORY_CA));
-        minter = ISEMinter(registry.getAddress(SANTA_ELENA_NFT_MINTER_CA));
+        factory = ISEAuditContractFactory(registry.getAddress(SANTA_ELENA_AUDIT_CONTRACT_FACTORY_CA));        
         self = address(this);
     }
 
@@ -46,10 +46,25 @@ contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVers
     }
 
 
-    function uploadFiles(string memory _ownerName, string memory _auditTitle, uint256 _maxAuditWindow, string [] memory _urisToAudit, string [] memory _uriLabels, bool [] memory _private, string memory _notesUri, string memory manifestUri) external returns (address _auditContract){
-        ISEAuditContract.AuditSeed memory _seed = generateSeed(_ownerName, msg.sender, _auditTitle, block.timestamp, _maxAuditWindow, 0,0,0,0,address(0),"");
-        (address erc1155_, uint256 nftId_) = minter.mintUploadProof(msg.sender, manifestUri);
-        _auditContract = factory.createAuditContract(_seed, _urisToAudit, _uriLabels,  _private, _notesUri, erc1155_,nftId_ );    
+    function uploadFiles(string memory _ownerName, 
+                        string memory _auditTitle, 
+                        uint256 _maxAuditWindow, 
+                        uint256 _carbonOffSet, 
+                        string [] memory _urisToAudit, 
+                        string [] memory _uriLabels, 
+                        bool [] memory _private, 
+                        string memory _notesUri, 
+                        string memory _uploadManifestUri) external returns (address _auditContract){
+        ISEAuditContract.AuditSeed memory _seed = generateSeed(_ownerName, 
+                                                                msg.sender, 
+                                                                _auditTitle, 
+                                                                block.timestamp, 
+                                                                _maxAuditWindow, 
+                                                                _carbonOffSet);
+        
+        ISEMintable mintable_ = ISEMintable(registry.getAddress(UPLOAD_MINTER_CA));
+        uint256 nftId_ = mintable_.mint(msg.sender, _uploadManifestUri);
+        _auditContract = factory.createAuditContract(_seed, _urisToAudit, _uriLabels,  _private, _notesUri, address(mintable_),nftId_ );    
         auditContractsByStatus["READY"].push(_auditContract);
         auditContractsByUser[msg.sender].push(_auditContract);
         return _auditContract;
@@ -64,12 +79,13 @@ contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVers
     }
 
     function getContractsUnderAuditor(address _auditor) view external returns (address [] memory _auditContracts) {
-        address [] memory addresses = auditContractsByStatus["BOOKED_FOR_AUDIT"];
+        address [] memory addresses_ = auditContractsByStatus["BOOKED_FOR_AUDIT"];
+        _auditContracts = new address[](addresses_.length);
         uint256 y = 0;
-        for(uint256 x = 0; x < addresses.length; x++) {
-            ISEAuditContract iseac_ = ISEAuditContract(addresses[x]);
+        for(uint256 x = 0; x < addresses_.length; x++) {
+            ISEAuditContract iseac_ = ISEAuditContract(addresses_[x]);
             if(iseac_.getAuditSeed().auditor == _auditor){
-                _auditContracts[y] = addresses[x];
+                _auditContracts[y] = addresses_[x];
             }
         }
         return _auditContracts;
@@ -108,36 +124,31 @@ contract SEAuditManager is ISEAuditManager, ISEAuditManagerNotification, ISEVers
     function notifyChangeOfAddress() external returns (bool _notified) {
         adminOnly(); 
         registry = ISERegistry(registry.getAddress(SANTA_ELENA_REGISTRY_CA)); 
-        factory = ISEAuditContractFactory(registry.getAddress(SANTA_ELENA_AUDIT_CONTRACT_FACTORY_CA));
-        minter = ISEMinter(registry.getAddress(SANTA_ELENA_NFT_MINTER_CA));
+        factory = ISEAuditContractFactory(registry.getAddress(SANTA_ELENA_AUDIT_CONTRACT_FACTORY_CA));        
         return true; 
     }
 
 //================================================ INTERNAL =========================================================================================
         function generateSeed(       
-        string memory _ownerName,
-        address _owner,        
-        string memory _auditTitle,        
-        uint256 _uploadDate,        
-        uint256 _maxAuditWindow,        
-        uint256 _auditStart,         
-        uint256 _auditDate,        
-        uint256 _publishDate,         
-        uint256 _expires,        
-        address _auditor,         
-        string memory _auditorName ) pure internal returns (ISEAuditContract.AuditSeed memory _seed){
+                                string memory _ownerName,
+                                address _owner,        
+                                string memory _auditTitle,        
+                                uint256 _uploadDate,        
+                                uint256 _maxAuditWindow,                                        
+                                uint256 _carbonOffSet ) pure internal returns (ISEAuditContract.AuditSeed memory _seed){
             return  ISEAuditContract.AuditSeed({
                                                 ownerName      : _ownerName,
                                                 owner          :  _owner, 
                                                 auditTitle     : _auditTitle, 
                                                 uploadDate     : _uploadDate,         
                                                 maxAuditWindow : _maxAuditWindow, 
-                                                auditStart     : _auditStart,  
-                                                auditDate      : _auditDate,         
-                                                publishDate    : _publishDate, 
-                                                expires        : _expires ,
-                                                auditor        : _auditor,         
-                                                auditorName    : _auditorName 
+                                                auditStart     : 0,  
+                                                auditDate      : 0,         
+                                                publishDate    : 0, 
+                                                expires        : 0,
+                                                auditor        : address(0),         
+                                                auditorName    : "",
+                                                carbonOffSet   : _carbonOffSet 
                                             });
                                 
         }
