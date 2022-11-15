@@ -44,4 +44,4 @@ The demonstration UI is deployed at the following address:
 https://fragrant-hat-0277.on.fleek.co/
 
 ## Youtube Explainer 
-https://youtu.be/R2mulX_f0GA
+[https://youtu.be/O_cKuHnD6sk](https://youtu.be/O_cKuHnD6sk)
