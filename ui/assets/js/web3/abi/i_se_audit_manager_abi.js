@@ -100,6 +100,11 @@ iSEAuditManagerAbi = [
 				"type": "uint256"
 			},
 			{
+				"internalType": "uint256",
+				"name": "_carbonOffset",
+				"type": "uint256"
+			},
+			{
 				"internalType": "string[]",
 				"name": "_urisToAudit",
 				"type": "string[]"
@@ -121,7 +126,7 @@ iSEAuditManagerAbi = [
 			},
 			{
 				"internalType": "string",
-				"name": "_manifestUri",
+				"name": "_uploadManifestUri",
 				"type": "string"
 			}
 		],

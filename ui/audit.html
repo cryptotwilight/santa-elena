@@ -323,7 +323,7 @@
                 var status = response; 
                 if(status === "AWAITING_AUDIT"){
                     var row = tbody.insertRow(); 
-                    buildAARow(auditAddress, row, status);
+                    buildAARow(auditContractAddress, row, status);
                 }
             })
             .catch(function(err){
@@ -332,7 +332,7 @@
            
         }
 
-        function buildOARow(auditAddress, row, status) {
+        function buildOARow(auditAddress, row) {
             var auditContract = getContract(iSEAuditContractAbi, auditAddress);            
 
             var titleCell             = row.insertCell();
@@ -344,22 +344,24 @@
             
             auditContract.methods.getAuditSeed().call({from : account })
             .then(function(response){
+                console.log(response)
+                var seed = response;
                 var a = ce("a");
-                a.setAttribute("href", "assessment_review.html?assessment="+auditAddress);
+                a.setAttribute("href", "assessment_review.html?auditContract="+auditAddress);
                 a.append(text(seed.auditTitle));
                 titleCell.append(a);
                 
                 ownerCell.append(text(seed.ownerName));
-                ownerCell.append(ce(br));
+                ownerCell.append(ce("br"));
                 var small = ce("small");
-                small.append(text(seed.owner)); 
+                small.append(shortenAddressAndLink(seed.owner)); 
                 ownerCell.append(small);
                 
                 setFileCount(auditContract, fileCountCell);
 
                 setEstimatedAuditEndDate(auditContract, auditEndDateCell);
                 
-                statusCell.append(text(status));                
+                setStatus(auditContract, statusCell);              
             
             })
             .catch(function(err){
@@ -387,7 +389,7 @@
         }
 
         function setEstimatedAuditEndDate(auditContract, auditEndDateCell) {
-            auditContract.methods.getEstimatedAuditEndTime().call({from : acount})
+            auditContract.methods.getEstimatedAuditEndTime().call({from : account})
             .then(function(response){
                 console.log(response);
                 auditEndDateCell.append(text(format(response)));
@@ -397,7 +399,7 @@
             })
         }
 
-        function buildAARow(auditAddress, row) {
+        function buildAARow(auditAddress, row, status) {
             var auditContract = getContract(iSEAuditContractAbi, auditAddress);            
 
             var titleCell               = row.insertCell();
@@ -419,7 +421,7 @@
                 ownerCell.append(text(seed.ownerName));
                 ownerCell.append(ce("br"));
                 var small = ce("small");
-                small.append(text(seed.owner)); 
+                small.append(shortenAddressAndLink(seed.owner)); 
                 ownerCell.append(small);
 
                 setFileCount(auditContract, fileCountCell);
@@ -427,7 +429,20 @@
                 maxAuditPeriodCell.append(text(seed.maxAuditWindow/(60*60*24) + " days "));
                 
                 setStatus(auditContract, statusCell);
+
                 populateBookingCell(bookingCell, auditAddress);
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+        }
+
+        function setStatus(auditContract, statusCell) {
+            auditContract.methods.getStatus().call({from : account})
+            .then(function(response){
+                console.log(response);
+                var status = response; 
+                statusCell.append(text(status));
             })
             .catch(function(err){
                 console.log(err);
@@ -436,6 +451,28 @@
 
         function bookForAudit(auditContractAddress) {
 
+        }
+        const size = 4;
+// const blockchain = "https://goerli.etherscan.io/address/";
+// const blockchain = "https://explorer.glif.io/wallaby/address/";
+const blockchain = "https://sepolia.etherscan.io/";
+function shortenAddressAndLink(address) {
+	var first = address.slice(0, size + 1);
+	var last = address.slice(-size);
+	var a = ce("a");
+	a.setAttribute("href",blockchain + address);
+	var result = first + "..." + last;
+	a.append(text(result));
+	a.setAttribute("target", "_blank");
+	return a;
+}
+        function format(d) {
+            if(d > 0){
+                var date = new Date(d*1000);
+                var formatted = date.getUTCFullYear() + "/" + date.getUTCMonth() + "/" + date.getUTCDate() + " " + date.getUTCHours() + " : " + (date.getUTCMinutes() < 10? "0"+ date.getUTCMinutes() : date.getUTCMinutes()) + " UTC";
+                return formatted; 
+            }
+            return ""; 
         }
     </script>
 </body>

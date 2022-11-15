@@ -223,6 +223,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
+
                                                                     <div class="col-12">
                                                                         <div class="form-group has-icon-left">
                                                                             <label for="first-name-icon">Audit Title</label>
@@ -236,6 +237,18 @@
                                                                     </div>
                                                                     <div class="col-12">
                                                                         <div class="form-group has-icon-left">
+                                                                            <label for="first-name-icon">Carbon Offset Claim</label>
+                                                                            <div class="position-relative">
+                                                                                <input type="text" id=carbon_offset_claim" class="form-control" placeholder="enter max audit window in days" >
+                                                                                <div class="form-control-icon">
+                                                                                    <i class="bi bi-grid-fill"></i>
+                                                                                </div>
+                                                                            </div> 
+                                                                            Kg CO<sub>2e</sub>/kWh
+                                                                        </div>
+                                                                    </div>   
+                                                                    <div class="col-12">
+                                                                        <div class="form-group has-icon-left">
                                                                             <label for="first-name-icon">Max Audit Window</label>
                                                                             <div class="position-relative">
                                                                                 <input type="text" id="max_audit_window" class="form-control" placeholder="enter max audit window in days" >
@@ -243,6 +256,7 @@
                                                                                     <i class="bi bi-calendar"></i>
                                                                                 </div>
                                                                             </div>
+                                                                            Days
                                                                         </div>
                                                                     </div>                                                            
                                                                 </td> 
@@ -362,6 +376,8 @@
         const ownerName = ge("owner_name");
         const auditTitle = ge("audit_title");
         const maxAuditWindow = ge("max_audit_window");
+        const carbonOffsetClaim = ge("carbon_offset_claim");
+        
         const uploadedFiles = ge("uploaded_files");
         const auditorNotes = ge("auditor_notes");
         const auditOwnerAccountDisplay = ge("audit_owner_account_display");
@@ -492,8 +508,11 @@
            a.append(text("View"));
            viewCell.append(a);
         }
+
+
         const size = 4;
-        const blockchain = "https://goerli.etherscan.io/address/";
+       // const blockchain = "https://goerli.etherscan.io/address/";
+       const blockchain = "https://explorer.glif.io/wallaby/address/";
         function shortenAddressAndLink(address) {
             var first = address.slice(0, size + 1);
             var last = address.slice(-size);
@@ -672,14 +691,14 @@
                 console.log(response);
                 var manifestUri = response.value.cid; 
                 // upload 
-                postToBlockchain(ownerName.value, auditTitle.value, maxAuditWindow, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri);
+                postToBlockchain(ownerName.value, auditTitle.value, maxAuditWindow.value * (24*60 *60), carbonOffsetClaim.value, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri);
             })
             .catch(function(err){
                 console.log(err);
             });  
         }
 
-        function postToBlockchain(ownerName, auditTitle, maxAuditWindow, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri) {
+        function postToBlockchain(ownerName, auditTitle, mxAuditWindow,carbonOffset, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri) {
             console.log("sending");
             console.log(sEAuditManagerContract);
             console.log(seed);
@@ -688,7 +707,7 @@
             console.log(isPrivate);
             console.log(notesUri);
             console.log(manifestUri);
-            sEAuditManagerContract.methods.uploadFiles(ownerName, auditTitle, maxAuditWindow, carbonOffsetClaim, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri).send({from : account})
+            sEAuditManagerContract.methods.uploadFiles(ownerName, auditTitle, mxAuditWindow, carbonOffset, urisToAudit, onchainLabels, isPrivate, notesUri, manifestUri).send({from : account})
             .then(function(response){
                 console.log(response);
                 displayLatestAssessments(); 

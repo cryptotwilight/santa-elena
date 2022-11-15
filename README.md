@@ -11,6 +11,20 @@ NFT.storage is used to mint the NFTs that are used for proof
 Web3.storage is used to store the uploaded files for the assessment. 
 
 ## Deployed Contracts 
+### Testnet Wallaby - Filecoin EVM 
+|Contract 									     |Address 		  		                   |Version|
+|------------------------------------------------|-------------------------------------------|-----|
+|Santa Elena Registry 							 |0x7a4F1b7A5207316Cac6C2a92d8EC59f3299f149c |5    |
+|Santa Elena Audit Manager 						 |0xE6aab3530315a21059394B34f3B99295Ea379203 |14   |
+|												 | 									         |     |
+|Santa Elena Contract Factory 					 |0xE0Dd5774688e09453480a4258498b29a3A824f2a |15   |
+|Santa Elena Minter 							 |0x730D6819C89c28749398bf65CB012150be9CeEea |8    |
+|Santa Elena Audit Declaration NFT Contract 	 |0x8c8cbf24D3c117b0ee4B2d7A59EDFE3cDB275c2E |3    |
+|Santa Elena Upload Proof Contract 				 |0x5BF6b0cacEe073b5c28635D0BeE0A407F3b130DD |3    |
+|Santa Elena Audit Submission Proof Contract 	 |0x5509b216591AA36793302e19D0bba63D6FAC1EE9 |3    |
+
+
+### Goerlie Testnet 
 The Smart Contracts for Santa Elena are deployed on the Goerlie Testnet and can be accessed at the following addresses
 |Contract 									     |Address 		  		                   |Version|
 |------------------------------------------------|-------------------------------------------|-----|

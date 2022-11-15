@@ -1,7 +1,11 @@
 const connectBlockchainButton = ge("connect_web3");
 const showWallet = ge("show_wallet");
 const web3 = new Web3(window.ethereum);
-const iSERegistryAddress = "0xF5C41b43F1E7B39Ae5b5B01194f1a6E6D40955A4"; 
+
+// const iSERegistryAddress = "0xF5C41b43F1E7B39Ae5b5B01194f1a6E6D40955A4"; // Goerli
+
+// const iSERegistryAddress = "0x7a4F1b7A5207316Cac6C2a92d8EC59f3299f149c"; // Testnet Wallaby 
+const iSERegistryAddress = "0xE6C1A97e57E9A961d9Df513346BEEDC1707Aab09"; // Sepolia
 var iSERegistryContract;
 var iSEAuditManagerAddress;
 var sEAuditManagerContract; 

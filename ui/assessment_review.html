@@ -337,7 +337,9 @@
                     showBookForAudit(); 
                 }
                 if(status === "BOOKED_FOR_AUDIT") {
+                    console.log("showing submit stuff");
                     if(account.toLowerCase() === seed.auditor.toLowerCase()){
+                        console.log("auditor access");
                         showSubmitAudit(); // auditor only
                     }
                 }
@@ -524,7 +526,7 @@
            var label = ce("label");
            label.setAttribute("for","auditor_name");
            label.append(text("Enter Auditor Name"));
-           p.append(label2);
+           p.append(label);
            var br = ce("br");
            p.append(br);
            var input = ce("input");
@@ -579,8 +581,10 @@
            var h4 = ce("h4");
            h4.append(text("Submit Audit Report and Declaration"));
            cardHeader.append(h4);
+           card.append(cardHeader);
            var cardBody = ce("div");
            cardBody.setAttribute("class", "card-body");
+           card.append(cardBody);
           
            var table = ce("table");
            cardBody.append(table);
@@ -590,16 +594,15 @@
            // declaration
            var p = ce("p");
            declarationCell.append(p);
-           p.setAttribute("class", "card-text");
-           cardBody.append(p);
+           p.setAttribute("class", "card-text");           
            var label = ce("label");
            label.setAttribute("for","audit_declaration");
            label.append(text("Audit Declaration"));
-           cardBody.append(label);
+           p.append(label);
            var selectDeclaration = ce("select");
            selectDeclaration.setAttribute("id", "audit_declaration");
            selectDeclaration.setAttribute("class","form-control");
-           cardBody.append(selectDeclaration);
+           p.append(selectDeclaration);
            var option1 = ce("option");
            var option2 = ce("option");
            option1.setAttribute("value", "0");
@@ -676,7 +679,8 @@
                     var uriCell = row.insertCell();     
                     
                     console.log("account " + account + " seed " + seed.owner);
-                    if(auditUri.isPrivate){
+                    console.log("audit uri : " + auditUri.isPrivate);
+                    if(auditUri.isPrivate == true ){
 
                         if(account.toLowerCase() === seed.owner.toLowerCase() || account.toLowerCase() === seed.auditor.toLowerCase()) {
                             var a = ce("a");        
